@@ -7,7 +7,7 @@ import html, json, os, pathlib
 ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / "src"
 
-CONTACT = os.environ.get("NOVA_CONTACT", "hinova.app@gmail.com")  # Nova's own Gmail (owner, 2026-11-14)
+CONTACT = os.environ.get("NOVA_CONTACT", "hi@hi-nova.com")  # forwards (ImprovMX) to Nova's Gmail (owner, 2026-11-14)
 OPERATOR = os.environ.get("NOVA_OPERATOR", "Oren Lugashi")  # operates Nova; the Google developer account name (owner, 2026-11-14)
 # The app's signing certificates (SHA-256). EAS's key signs the sideloaded APK and uploads to Play; add Google
 # Play's app-signing key here once Play Console shows it (Setup → App signing).
