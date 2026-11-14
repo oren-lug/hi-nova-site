@@ -1,0 +1,281 @@
+/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
+   Tokens are the app's own (mobile theme/tokens.ts, design V4 "Horizon"): warm paper, ink, Nova pink. */
+:root {
+  --bg: #FBFAF7; --surface: #FFFFFF; --nav: #F3F1EC; --border: #ECE9E2; --text: #1C1D21; --muted: #6B6D74;
+  --pink: #E8437E; --pink-light: #FF7FA9; --soon: #B0782E; --ok: #5C8A69; --mark: #FFF4D6;
+  --heading: "Rubik", "Heebo", system-ui, sans-serif;
+  --body: "Heebo", "Rubik", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141518; --surface: #1C1D21; --nav: #101114; --border: #2A2B30; --text: #EDEBE6; --muted: #9C9EA5;
+  --pink: #FF7FA9; --pink-light: #FFA3C2; --soon: #D6A35F; --ok: #7FB08B; --mark: #3A3320; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141518; --surface: #1C1D21; --nav: #101114; --border: #2A2B30; --text: #EDEBE6; --muted: #9C9EA5;
+  --pink: #FF7FA9; --pink-light: #FFA3C2; --soon: #D6A35F; --ok: #7FB08B; --mark: #3A3320; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.65; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--heading); font-weight: 500; line-height: 1.2; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--pink); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; border-radius: 6px; }
+
+/* Language: Hebrew unless the page is switched to English; without script, Hebrew only. */
+html:not([data-lang="en"]) [data-l="en"], html[data-lang="en"] [data-l="he"] { display: none !important; }
+
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--heading); font-size: 1.35rem; font-weight: 500; }
+.mark svg { width: 38px; height: 38px; flex: none; }
+.top nav { display: flex; align-items: center; gap: 18px; font-size: 0.95rem; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--text); }
+.lang { font: inherit; font-size: 0.9rem; color: var(--text); background: var(--nav); border: 1px solid var(--border); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: center; padding-block: 48px 72px; }
+.hero > * { min-width: 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.02em; }
+.eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin-top: 14px; }
+.hero h1 em { font-style: normal; color: var(--pink); }
+.hero .lede { margin-top: 18px; font-size: 1.12rem; color: var(--muted); max-width: 34em; }
+.cta { margin-top: 30px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn { display: inline-block; text-decoration: none; font-family: var(--heading); font-weight: 500; background: var(--text); color: var(--bg); padding: 12px 22px; border-radius: 14px; }
+.btn:hover { opacity: 0.9; }
+.cta small { color: var(--muted); font-size: 0.9rem; }
+
+/* The sample answer: how a real answer looks, labelled as an example. */
+.sample { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 18px 40px -28px rgba(28, 29, 33, 0.35); }
+.sample .tag { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.bubble { padding: 12px 16px; border-radius: 18px; max-width: 90%; }
+.bubble.q { background: var(--nav); justify-self: end; }
+.bubble.a { background: var(--bg); border: 1px solid var(--border); justify-self: start; }
+.bubble.a strong { font-family: var(--heading); font-weight: 500; background: var(--mark); padding: 0 4px; border-radius: 4px; }
+.source { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+.source::before { content: ""; width: 14px; height: 18px; border: 1.5px solid var(--muted); border-radius: 3px; flex: none;
+  background: linear-gradient(var(--muted), var(--muted)) center 5px / 7px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center 9px / 7px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center 13px / 5px 1.5px no-repeat; }
+
+section.block { padding-block: 56px; border-top: 1px solid var(--border); }
+section.block > h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+section.block > .sub { margin-top: 10px; color: var(--muted); max-width: 40em; }
+.grid { margin-top: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 32px; }
+.grid h3 { font-size: 1.12rem; }
+.grid p { margin-top: 6px; color: var(--muted); font-size: 0.98rem; }
+.grid .n { font-family: var(--heading); color: var(--pink); font-size: 0.85rem; display: block; margin-bottom: 6px; }
+
+.privacy { background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 36px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 36px; }
+.privacy > * { min-width: 0; }
+.privacy h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.privacy ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.privacy li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; }
+.privacy li::before { content: ""; width: 14px; height: 14px; margin-top: 7px; border-radius: 4px; background: linear-gradient(var(--pink-light), var(--pink)); }
+.privacy .more { margin-top: 14px; display: inline-block; }
+
+footer.bottom { padding-block: 36px 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 56px; }
+footer.bottom a { color: var(--muted); }
+
+/* The privacy policy: a readable document. */
+.doc { max-width: 46em; padding-block: 24px 40px; }
+.doc h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.doc .updated { margin-top: 8px; color: var(--muted); font-size: 0.95rem; }
+.doc h2 { font-size: 1.3rem; margin-top: 38px; }
+.doc p, .doc ul { margin-top: 12px; }
+.doc ul { padding-inline-start: 1.2em; display: grid; gap: 8px; }
+.doc li strong, .doc p strong { font-weight: 600; }
+.doc .short { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px 22px; margin-top: 24px; }
+.doc .short ul { margin-top: 8px; }
+.fill { background: var(--mark); border-radius: 4px; padding: 0 4px; font-weight: 600; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding-block: 24px 48px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .privacy { grid-template-columns: 1fr; padding: 24px; }
+}
+@media (max-width: 520px) {
+  .grid { grid-template-columns: 1fr; }
+  .top nav .hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn { transition: opacity 0.15s; } }
+
+/* ── Nova's sky (the app's NovaSky): a dark sky, the badge's pinks glowing and drifting, faint hexagons rising.
+      Same colours, sizes (fractions of the sky's width) and timings as the app; still when motion is reduced.
+      The page itself sits on the paper sheet that overlaps the sky with rounded top corners, as in the app. ── */
+.sky { position: relative; overflow: hidden; color: #FFFFFF; background: linear-gradient(#1E1E24, #111114 55%, #0B0B0E); padding-bottom: 28px; isolation: isolate; }
+.sky > .wrap { position: relative; z-index: 2; }
+.sky::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.38)); }
+.glow, .rise { position: absolute; z-index: 0; pointer-events: none; }
+.glow { aspect-ratio: 1; border-radius: 50%;
+  width: calc(var(--s) * 100%); inset-inline-start: calc(var(--x) * 100%); top: calc(var(--y) * 100%);
+  /* Centre on (x, y): a margin in % is a fraction of the sky's width, like the size. */
+  margin-inline-start: calc(var(--s) * -50%); margin-top: calc(var(--s) * -50%);
+  opacity: var(--o);
+  background: radial-gradient(closest-side, var(--c) 0%, color-mix(in srgb, var(--c) 55%, transparent) 45%, transparent 100%); }
+.rise { top: 0; bottom: 0; width: calc(var(--s) * 100%); inset-inline-start: calc(var(--x) * 100%); margin-inline-start: calc(var(--s) * -50%);
+  transform: translateY(calc(100% - var(--f) * 130%)); opacity: var(--o); }
+.rise svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rise path { fill: none; stroke: #FFFFFF; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .glow { animation: drift var(--d) ease-in-out infinite alternate; animation-delay: calc(var(--d) * -0.5); }
+  .rise { animation: rise var(--d) linear infinite; animation-delay: calc(var(--d) * var(--f) * -1); }
+  .rise svg { animation: turn var(--d) linear infinite; animation-delay: calc(var(--d) * var(--f) * -1); }
+}
+@keyframes drift {
+  from { transform: translate(calc(var(--dx) * -50%), calc(var(--dy) * -50%)) scale(1); }
+  to { transform: translate(calc(var(--dx) * 50%), calc(var(--dy) * 50%)) scale(var(--k)); }
+}
+/* Bottom to top, fading in and out so the jump back down is never seen. */
+@keyframes rise {
+  0% { transform: translateY(100%); opacity: 0; }
+  15% { opacity: var(--o); }
+  85% { opacity: var(--o); }
+  100% { transform: translateY(-30%); opacity: 0; }
+}
+/* One rise turns 60°, which the hexagon can't tell from 0°. */
+@keyframes turn { to { transform: rotate(calc(var(--t) * 60deg)); } }
+
+/* Text on the sky: white, like the app's scene titles. */
+.sky .mark { color: #FFFFFF; }
+.sky .top nav a { color: rgba(255, 255, 255, 0.78); }
+.sky .top nav a:hover { color: #FFFFFF; }
+.sky .lang { color: #FFFFFF; background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.30); }
+.sky .eyebrow { color: rgba(255, 255, 255, 0.85); }
+.sky .eyebrow::before { background: #7FB08B; }
+.sky .hero h1 em { color: #FF7FA9; }
+.sky .hero .lede { color: rgba(255, 255, 255, 0.85); }
+.sky .btn { background: #FFFFFF; color: #111114; }
+.sky .cta small { color: rgba(255, 255, 255, 0.78); }
+.sky a { color: #FF9FBE; }
+.sky .sample { color: var(--text); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7); }
+.sky .doc-head { padding-block: 28px 44px; max-width: 46em; }
+.sky .doc-head h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.sky .doc-head .updated { margin-top: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; }
+.fill { color: var(--text); }
+
+.sheet { position: relative; z-index: 3; margin-top: -28px; background: var(--bg); border-radius: 28px 28px 0 0; padding-top: 8px; }
+.sheet section.block:first-child { border-top: 0; }
+.sheet .doc { padding-top: 28px; }
+
+/* ── Version 2: the conversation, icon cards, thoughts, sharing, privacy, the testers' calls to action. ── */
+[hidden] { display: none !important; }
+.kicker { display: block; margin-bottom: 10px; font-family: var(--heading); font-size: 0.85rem; letter-spacing: 0.06em; color: var(--pink); }
+section.block > h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); max-width: 22em; }
+section.block > .sub, .split .sub { margin-top: 12px; color: var(--muted); max-width: 38em; font-size: 1.05rem; }
+
+/* Buttons: ink on paper, white on the sky; the second one is an outline. */
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn.alt { background: transparent; color: var(--text); border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+.sky .btn.alt { background: rgba(255, 255, 255, 0.14); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.32); }
+.btn.sm { padding: 8px 14px; font-size: 0.92rem; border-radius: 12px; }
+
+/* The hero conversation. */
+.chat { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 24px; padding: 18px 18px 20px; display: grid; gap: 12px; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7); }
+.chat-head { display: flex; justify-content: space-between; align-items: center; }
+.chat-head .who { display: flex; align-items: center; gap: 8px; font-family: var(--heading); font-weight: 500; }
+.chat-head .who svg { width: 24px; height: 24px; }
+.chat-head .tag { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; }
+.chat-log { height: 310px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px;
+  -webkit-mask-image: linear-gradient(transparent, #000 24%); mask-image: linear-gradient(transparent, #000 24%); }
+.turn { display: grid; gap: 8px; }
+.bubble.a { display: grid; gap: 6px; }
+.bubble.a .source { font-size: 0.8rem; }
+.typing { justify-self: start; display: inline-flex; gap: 5px; padding: 14px 16px; border-radius: 18px; background: var(--bg); border: 1px solid var(--border); }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: 0.4; }
+@media (prefers-reduced-motion: no-preference) {
+  .enter { animation: pop 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .typing i { animation: blink 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: 0.15s; }
+  .typing i:nth-child(3) { animation-delay: 0.3s; }
+  .card, .thought { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card:hover, .thought:hover { transform: translateY(-3px); }
+}
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+@keyframes blink { 50% { opacity: 1; } }
+
+/* Icon cards. */
+.cards { display: grid; gap: 18px; margin-top: 34px; }
+.cards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 24px; display: grid; align-content: start; gap: 10px; }
+.card:hover { box-shadow: 0 20px 44px -30px rgba(28, 29, 33, 0.4); }
+.card h3 { font-size: 1.15rem; margin-top: 6px; }
+.card p { color: var(--muted); font-size: 0.98rem; }
+.ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: var(--pink);
+  background: color-mix(in srgb, var(--pink) 12%, var(--surface)); }
+.ico svg { width: 24px; height: 24px; }
+.ico.on-dark { background: rgba(255, 255, 255, 0.12); color: #FF9FBE; }
+
+/* A list with Nova-pink check marks. */
+.ticks { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
+.ticks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; }
+.ticks li::before { content: ""; width: 20px; height: 20px; margin-top: 3px; background: var(--pink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M8 12.3l2.7 2.7L16.2 9.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M8 12.3l2.7 2.7L16.2 9.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.ticks b { font-weight: 600; }
+
+/* Thoughts: the app's thought cards, a little staggered. */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.split > * { min-width: 0; }
+.thoughts { display: grid; gap: 14px; }
+.thought { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; display: grid; gap: 8px; box-shadow: 0 18px 40px -32px rgba(28, 29, 33, 0.45); }
+.thought:nth-child(2) { margin-inline-start: 36px; }
+.thought:nth-child(3) { margin-inline-start: 12px; }
+.thought-head { display: flex; align-items: center; gap: 8px; font-family: var(--heading); font-size: 0.92rem; color: var(--pink); }
+.thought-head svg { width: 20px; height: 20px; }
+.thought strong, .bubble.a strong { font-family: var(--heading); font-weight: 500; background: var(--mark); padding: 0 3px; border-radius: 4px; }
+
+/* The testers' strip, between sections. */
+.join-strip { margin-block: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 28px; padding: 28px 32px; border-radius: 26px;
+  background: color-mix(in srgb, var(--pink) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--pink) 22%, var(--border)); }
+.join-strip h2 { font-size: 1.45rem; }
+.join-strip p { margin-top: 6px; color: var(--muted); }
+.join-strip .cta { margin-top: 0; }
+
+/* Privacy: the vault on Nova's sky, the sign-in guards beside it, four promises below. */
+.privacy-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 18px; margin-top: 34px; }
+.privacy-grid > * { min-width: 0; }
+.vault { position: relative; overflow: hidden; border-radius: 22px; padding: 28px; color: #FFFFFF; display: grid; gap: 10px; align-content: start;
+  background: radial-gradient(circle at 90% 0%, rgba(232, 67, 126, 0.38), transparent 55%), radial-gradient(circle at 0% 100%, rgba(91, 35, 80, 0.55), transparent 60%), linear-gradient(#1E1E24, #111114 60%, #0B0B0E); }
+.vault::after { content: ""; position: absolute; width: 220px; height: 220px; inset-inline-end: -40px; bottom: -60px; opacity: 0.1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E") center / contain no-repeat; }
+.vault h3 { font-size: 1.25rem; margin-top: 6px; }
+.vault p { color: rgba(255, 255, 255, 0.82); position: relative; }
+.guard .ticks { margin-top: 8px; }
+.promises { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.promises li { border-top: 2px solid var(--pink); padding-top: 12px; font-size: 0.97rem; }
+#privacy .more { display: inline-block; margin-top: 22px; }
+
+/* The final call: a small sky of its own. */
+section.final { margin-top: 56px; border-radius: 28px; padding: 64px 28px; text-align: center; }
+.final-in { position: relative; z-index: 2; max-width: 38em; margin: 0 auto; display: grid; gap: 14px; justify-items: center; }
+.final h2 { font-size: clamp(1.7rem, 3.6vw, 2.4rem); }
+.final p { color: rgba(255, 255, 255, 0.85); }
+.final .cta { justify-content: center; margin-top: 8px; }
+.final small { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; }
+
+/* The dock: shows once the hero is out of view. */
+.dock { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; gap: 10px 14px; flex-wrap: wrap;
+  padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: color-mix(in srgb, var(--surface) 90%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border); font-family: var(--heading); font-weight: 500; }
+@media (prefers-reduced-motion: no-preference) { .dock { animation: pop 0.3s ease both; } }
+footer.bottom { padding-bottom: 96px; }
+
+@media (max-width: 980px) {
+  .cards.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .split, .privacy-grid { grid-template-columns: 1fr; gap: 32px; }
+  .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .cards.four, .cards.three, .promises { grid-template-columns: 1fr; }
+  .thought:nth-child(2), .thought:nth-child(3) { margin-inline-start: 0; }
+  .join-strip { padding: 22px; }
+  .dock > span { display: none; }
+  .chat-log { height: 280px; }
+  section.final { padding: 44px 20px; }
+}

@@ -1,0 +1,54 @@
+<div class="sky" id="top">
+{{SKY}}
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="/" aria-label="Nova">{{BADGE}}<span data-l="he">נובה</span><span data-l="en">Nova</span></a>
+    <nav>
+      <a href="/" data-l="he">לדף הבית</a><a href="/" data-l="en">Home</a>
+      <button class="lang" type="button" data-set-lang="en" data-l="he" lang="en">English</button>
+      <button class="lang" type="button" data-set-lang="he" data-l="en" lang="he">עברית</button>
+    </nav>
+  </header>
+
+  <!-- An invitation link (hi-nova.com/invite/…) opens the app when it's installed; anyone else lands here. -->
+  <div class="doc-head" data-invite hidden>
+    <h1 data-l="he">יש לכם הזמנה לתיקייה בנובה</h1>
+    <h1 data-l="en">You've been invited to a folder in Nova</h1>
+    <p class="updated" data-l="he">ההזמנה נפתחת באפליקציית נובה. אם נובה מותקנת אצלכם, פתחו את הקישור מהטלפון ותגיעו ישר להזמנה.</p>
+    <p class="updated" data-l="en">The invitation opens in the Nova app. If you have Nova installed, open the link on your phone and you'll go straight to it.</p>
+  </div>
+  <div class="doc-head" data-missing>
+    <h1 data-l="he">העמוד לא נמצא</h1>
+    <h1 data-l="en">Page not found</h1>
+    <p class="updated" data-l="he">אולי הקישור השתנה. אפשר להמשיך מדף הבית.</p>
+    <p class="updated" data-l="en">The link may have changed. You can carry on from the home page.</p>
+  </div>
+</div>
+</div>
+
+<main class="sheet">
+<div class="wrap">
+  <section class="join-strip" aria-label="Join">
+    <div>
+      <h2 data-l="he">עדיין אין לכם את נובה?</h2>
+      <h2 data-l="en">Don't have Nova yet?</h2>
+      <p data-l="he">נובה נמצאת כרגע בבדיקה פרטית לאנדרואיד. הצטרפו לקבוצת הבודקים או בקשו גישה, ונשלח לכם קישור.</p>
+      <p data-l="en">Nova is in private testing on Android. Join the testers' group or request access, and we'll send you a link.</p>
+    </div>
+    <div class="cta">{{CTA_BUTTONS}}</div>
+  </section>
+
+  <footer class="bottom">
+    <span>© 2026 <span data-l="he">נובה</span><span data-l="en">Nova</span></span>
+    <span><a href="/privacy.html" data-l="he">מדיניות פרטיות</a><a href="/privacy.html" data-l="en">Privacy policy</a> · {{CONTACT}}</span>
+  </footer>
+</div>
+</main>
+
+<script>
+(function () {
+  if (location.pathname.indexOf('/invite/') !== 0) return;
+  document.querySelector('[data-invite]').hidden = false;
+  document.querySelector('[data-missing]').hidden = true;
+})();
+</script>

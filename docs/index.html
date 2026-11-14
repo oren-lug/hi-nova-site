@@ -1,0 +1,584 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Nova</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Rubik:wght@500&display=swap"><style>/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
+   Tokens are the app's own (mobile theme/tokens.ts, design V4 "Horizon"): warm paper, ink, Nova pink. */
+:root {
+  --bg: #FBFAF7; --surface: #FFFFFF; --nav: #F3F1EC; --border: #ECE9E2; --text: #1C1D21; --muted: #6B6D74;
+  --pink: #E8437E; --pink-light: #FF7FA9; --soon: #B0782E; --ok: #5C8A69; --mark: #FFF4D6;
+  --heading: "Rubik", "Heebo", system-ui, sans-serif;
+  --body: "Heebo", "Rubik", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141518; --surface: #1C1D21; --nav: #101114; --border: #2A2B30; --text: #EDEBE6; --muted: #9C9EA5;
+  --pink: #FF7FA9; --pink-light: #FFA3C2; --soon: #D6A35F; --ok: #7FB08B; --mark: #3A3320; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141518; --surface: #1C1D21; --nav: #101114; --border: #2A2B30; --text: #EDEBE6; --muted: #9C9EA5;
+  --pink: #FF7FA9; --pink-light: #FFA3C2; --soon: #D6A35F; --ok: #7FB08B; --mark: #3A3320; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.65; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--heading); font-weight: 500; line-height: 1.2; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--pink); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; border-radius: 6px; }
+
+/* Language: Hebrew unless the page is switched to English; without script, Hebrew only. */
+html:not([data-lang="en"]) [data-l="en"], html[data-lang="en"] [data-l="he"] { display: none !important; }
+
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: var(--heading); font-size: 1.35rem; font-weight: 500; }
+.mark svg { width: 38px; height: 38px; flex: none; }
+.top nav { display: flex; align-items: center; gap: 18px; font-size: 0.95rem; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--text); }
+.lang { font: inherit; font-size: 0.9rem; color: var(--text); background: var(--nav); border: 1px solid var(--border); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: center; padding-block: 48px 72px; }
+.hero > * { min-width: 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); letter-spacing: 0.02em; }
+.eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin-top: 14px; }
+.hero h1 em { font-style: normal; color: var(--pink); }
+.hero .lede { margin-top: 18px; font-size: 1.12rem; color: var(--muted); max-width: 34em; }
+.cta { margin-top: 30px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn { display: inline-block; text-decoration: none; font-family: var(--heading); font-weight: 500; background: var(--text); color: var(--bg); padding: 12px 22px; border-radius: 14px; }
+.btn:hover { opacity: 0.9; }
+.cta small { color: var(--muted); font-size: 0.9rem; }
+
+/* The sample answer: how a real answer looks, labelled as an example. */
+.sample { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 18px 40px -28px rgba(28, 29, 33, 0.35); }
+.sample .tag { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.bubble { padding: 12px 16px; border-radius: 18px; max-width: 90%; }
+.bubble.q { background: var(--nav); justify-self: end; }
+.bubble.a { background: var(--bg); border: 1px solid var(--border); justify-self: start; }
+.bubble.a strong { font-family: var(--heading); font-weight: 500; background: var(--mark); padding: 0 4px; border-radius: 4px; }
+.source { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+.source::before { content: ""; width: 14px; height: 18px; border: 1.5px solid var(--muted); border-radius: 3px; flex: none;
+  background: linear-gradient(var(--muted), var(--muted)) center 5px / 7px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center 9px / 7px 1.5px no-repeat,
+              linear-gradient(var(--muted), var(--muted)) center 13px / 5px 1.5px no-repeat; }
+
+section.block { padding-block: 56px; border-top: 1px solid var(--border); }
+section.block > h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); }
+section.block > .sub { margin-top: 10px; color: var(--muted); max-width: 40em; }
+.grid { margin-top: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 32px; }
+.grid h3 { font-size: 1.12rem; }
+.grid p { margin-top: 6px; color: var(--muted); font-size: 0.98rem; }
+.grid .n { font-family: var(--heading); color: var(--pink); font-size: 0.85rem; display: block; margin-bottom: 6px; }
+
+.privacy { background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 36px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 36px; }
+.privacy > * { min-width: 0; }
+.privacy h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+.privacy ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.privacy li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; }
+.privacy li::before { content: ""; width: 14px; height: 14px; margin-top: 7px; border-radius: 4px; background: linear-gradient(var(--pink-light), var(--pink)); }
+.privacy .more { margin-top: 14px; display: inline-block; }
+
+footer.bottom { padding-block: 36px 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 56px; }
+footer.bottom a { color: var(--muted); }
+
+/* The privacy policy: a readable document. */
+.doc { max-width: 46em; padding-block: 24px 40px; }
+.doc h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.doc .updated { margin-top: 8px; color: var(--muted); font-size: 0.95rem; }
+.doc h2 { font-size: 1.3rem; margin-top: 38px; }
+.doc p, .doc ul { margin-top: 12px; }
+.doc ul { padding-inline-start: 1.2em; display: grid; gap: 8px; }
+.doc li strong, .doc p strong { font-weight: 600; }
+.doc .short { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px 22px; margin-top: 24px; }
+.doc .short ul { margin-top: 8px; }
+.fill { background: var(--mark); border-radius: 4px; padding: 0 4px; font-weight: 600; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding-block: 24px 48px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .privacy { grid-template-columns: 1fr; padding: 24px; }
+}
+@media (max-width: 520px) {
+  .grid { grid-template-columns: 1fr; }
+  .top nav .hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .btn { transition: opacity 0.15s; } }
+
+/* ── Nova's sky (the app's NovaSky): a dark sky, the badge's pinks glowing and drifting, faint hexagons rising.
+      Same colours, sizes (fractions of the sky's width) and timings as the app; still when motion is reduced.
+      The page itself sits on the paper sheet that overlaps the sky with rounded top corners, as in the app. ── */
+.sky { position: relative; overflow: hidden; color: #FFFFFF; background: linear-gradient(#1E1E24, #111114 55%, #0B0B0E); padding-bottom: 28px; isolation: isolate; }
+.sky > .wrap { position: relative; z-index: 2; }
+.sky::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.38)); }
+.glow, .rise { position: absolute; z-index: 0; pointer-events: none; }
+.glow { aspect-ratio: 1; border-radius: 50%;
+  width: calc(var(--s) * 100%); inset-inline-start: calc(var(--x) * 100%); top: calc(var(--y) * 100%);
+  /* Centre on (x, y): a margin in % is a fraction of the sky's width, like the size. */
+  margin-inline-start: calc(var(--s) * -50%); margin-top: calc(var(--s) * -50%);
+  opacity: var(--o);
+  background: radial-gradient(closest-side, var(--c) 0%, color-mix(in srgb, var(--c) 55%, transparent) 45%, transparent 100%); }
+.rise { top: 0; bottom: 0; width: calc(var(--s) * 100%); inset-inline-start: calc(var(--x) * 100%); margin-inline-start: calc(var(--s) * -50%);
+  transform: translateY(calc(100% - var(--f) * 130%)); opacity: var(--o); }
+.rise svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rise path { fill: none; stroke: #FFFFFF; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .glow { animation: drift var(--d) ease-in-out infinite alternate; animation-delay: calc(var(--d) * -0.5); }
+  .rise { animation: rise var(--d) linear infinite; animation-delay: calc(var(--d) * var(--f) * -1); }
+  .rise svg { animation: turn var(--d) linear infinite; animation-delay: calc(var(--d) * var(--f) * -1); }
+}
+@keyframes drift {
+  from { transform: translate(calc(var(--dx) * -50%), calc(var(--dy) * -50%)) scale(1); }
+  to { transform: translate(calc(var(--dx) * 50%), calc(var(--dy) * 50%)) scale(var(--k)); }
+}
+/* Bottom to top, fading in and out so the jump back down is never seen. */
+@keyframes rise {
+  0% { transform: translateY(100%); opacity: 0; }
+  15% { opacity: var(--o); }
+  85% { opacity: var(--o); }
+  100% { transform: translateY(-30%); opacity: 0; }
+}
+/* One rise turns 60°, which the hexagon can't tell from 0°. */
+@keyframes turn { to { transform: rotate(calc(var(--t) * 60deg)); } }
+
+/* Text on the sky: white, like the app's scene titles. */
+.sky .mark { color: #FFFFFF; }
+.sky .top nav a { color: rgba(255, 255, 255, 0.78); }
+.sky .top nav a:hover { color: #FFFFFF; }
+.sky .lang { color: #FFFFFF; background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.30); }
+.sky .eyebrow { color: rgba(255, 255, 255, 0.85); }
+.sky .eyebrow::before { background: #7FB08B; }
+.sky .hero h1 em { color: #FF7FA9; }
+.sky .hero .lede { color: rgba(255, 255, 255, 0.85); }
+.sky .btn { background: #FFFFFF; color: #111114; }
+.sky .cta small { color: rgba(255, 255, 255, 0.78); }
+.sky a { color: #FF9FBE; }
+.sky .sample { color: var(--text); box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7); }
+.sky .doc-head { padding-block: 28px 44px; max-width: 46em; }
+.sky .doc-head h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+.sky .doc-head .updated { margin-top: 8px; color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; }
+.fill { color: var(--text); }
+
+.sheet { position: relative; z-index: 3; margin-top: -28px; background: var(--bg); border-radius: 28px 28px 0 0; padding-top: 8px; }
+.sheet section.block:first-child { border-top: 0; }
+.sheet .doc { padding-top: 28px; }
+
+/* ── Version 2: the conversation, icon cards, thoughts, sharing, privacy, the testers' calls to action. ── */
+[hidden] { display: none !important; }
+.kicker { display: block; margin-bottom: 10px; font-family: var(--heading); font-size: 0.85rem; letter-spacing: 0.06em; color: var(--pink); }
+section.block > h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); max-width: 22em; }
+section.block > .sub, .split .sub { margin-top: 12px; color: var(--muted); max-width: 38em; font-size: 1.05rem; }
+
+/* Buttons: ink on paper, white on the sky; the second one is an outline. */
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn.alt { background: transparent; color: var(--text); border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+.sky .btn.alt { background: rgba(255, 255, 255, 0.14); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.32); }
+.btn.sm { padding: 8px 14px; font-size: 0.92rem; border-radius: 12px; }
+
+/* The hero conversation. */
+.chat { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 24px; padding: 18px 18px 20px; display: grid; gap: 12px; box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7); }
+.chat-head { display: flex; justify-content: space-between; align-items: center; }
+.chat-head .who { display: flex; align-items: center; gap: 8px; font-family: var(--heading); font-weight: 500; }
+.chat-head .who svg { width: 24px; height: 24px; }
+.chat-head .tag { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; }
+.chat-log { height: 310px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px;
+  -webkit-mask-image: linear-gradient(transparent, #000 24%); mask-image: linear-gradient(transparent, #000 24%); }
+.turn { display: grid; gap: 8px; }
+.bubble.a { display: grid; gap: 6px; }
+.bubble.a .source { font-size: 0.8rem; }
+.typing { justify-self: start; display: inline-flex; gap: 5px; padding: 14px 16px; border-radius: 18px; background: var(--bg); border: 1px solid var(--border); }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: 0.4; }
+@media (prefers-reduced-motion: no-preference) {
+  .enter { animation: pop 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .typing i { animation: blink 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: 0.15s; }
+  .typing i:nth-child(3) { animation-delay: 0.3s; }
+  .card, .thought { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card:hover, .thought:hover { transform: translateY(-3px); }
+}
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+@keyframes blink { 50% { opacity: 1; } }
+
+/* Icon cards. */
+.cards { display: grid; gap: 18px; margin-top: 34px; }
+.cards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 24px; display: grid; align-content: start; gap: 10px; }
+.card:hover { box-shadow: 0 20px 44px -30px rgba(28, 29, 33, 0.4); }
+.card h3 { font-size: 1.15rem; margin-top: 6px; }
+.card p { color: var(--muted); font-size: 0.98rem; }
+.ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: var(--pink);
+  background: color-mix(in srgb, var(--pink) 12%, var(--surface)); }
+.ico svg { width: 24px; height: 24px; }
+.ico.on-dark { background: rgba(255, 255, 255, 0.12); color: #FF9FBE; }
+
+/* A list with Nova-pink check marks. */
+.ticks { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
+.ticks li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; }
+.ticks li::before { content: ""; width: 20px; height: 20px; margin-top: 3px; background: var(--pink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M8 12.3l2.7 2.7L16.2 9.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M8 12.3l2.7 2.7L16.2 9.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.ticks b { font-weight: 600; }
+
+/* Thoughts: the app's thought cards, a little staggered. */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.split > * { min-width: 0; }
+.thoughts { display: grid; gap: 14px; }
+.thought { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; display: grid; gap: 8px; box-shadow: 0 18px 40px -32px rgba(28, 29, 33, 0.45); }
+.thought:nth-child(2) { margin-inline-start: 36px; }
+.thought:nth-child(3) { margin-inline-start: 12px; }
+.thought-head { display: flex; align-items: center; gap: 8px; font-family: var(--heading); font-size: 0.92rem; color: var(--pink); }
+.thought-head svg { width: 20px; height: 20px; }
+.thought strong, .bubble.a strong { font-family: var(--heading); font-weight: 500; background: var(--mark); padding: 0 3px; border-radius: 4px; }
+
+/* The testers' strip, between sections. */
+.join-strip { margin-block: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 28px; padding: 28px 32px; border-radius: 26px;
+  background: color-mix(in srgb, var(--pink) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--pink) 22%, var(--border)); }
+.join-strip h2 { font-size: 1.45rem; }
+.join-strip p { margin-top: 6px; color: var(--muted); }
+.join-strip .cta { margin-top: 0; }
+
+/* Privacy: the vault on Nova's sky, the sign-in guards beside it, four promises below. */
+.privacy-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 18px; margin-top: 34px; }
+.privacy-grid > * { min-width: 0; }
+.vault { position: relative; overflow: hidden; border-radius: 22px; padding: 28px; color: #FFFFFF; display: grid; gap: 10px; align-content: start;
+  background: radial-gradient(circle at 90% 0%, rgba(232, 67, 126, 0.38), transparent 55%), radial-gradient(circle at 0% 100%, rgba(91, 35, 80, 0.55), transparent 60%), linear-gradient(#1E1E24, #111114 60%, #0B0B0E); }
+.vault::after { content: ""; position: absolute; width: 220px; height: 220px; inset-inline-end: -40px; bottom: -60px; opacity: 0.1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E") center / contain no-repeat; }
+.vault h3 { font-size: 1.25rem; margin-top: 6px; }
+.vault p { color: rgba(255, 255, 255, 0.82); position: relative; }
+.guard .ticks { margin-top: 8px; }
+.promises { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.promises li { border-top: 2px solid var(--pink); padding-top: 12px; font-size: 0.97rem; }
+#privacy .more { display: inline-block; margin-top: 22px; }
+
+/* The final call: a small sky of its own. */
+section.final { margin-top: 56px; border-radius: 28px; padding: 64px 28px; text-align: center; }
+.final-in { position: relative; z-index: 2; max-width: 38em; margin: 0 auto; display: grid; gap: 14px; justify-items: center; }
+.final h2 { font-size: clamp(1.7rem, 3.6vw, 2.4rem); }
+.final p { color: rgba(255, 255, 255, 0.85); }
+.final .cta { justify-content: center; margin-top: 8px; }
+.final small { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; }
+
+/* The dock: shows once the hero is out of view. */
+.dock { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; gap: 10px 14px; flex-wrap: wrap;
+  padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: color-mix(in srgb, var(--surface) 90%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border); font-family: var(--heading); font-weight: 500; }
+@media (prefers-reduced-motion: no-preference) { .dock { animation: pop 0.3s ease both; } }
+footer.bottom { padding-bottom: 96px; }
+
+@media (max-width: 980px) {
+  .cards.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .split, .privacy-grid { grid-template-columns: 1fr; gap: 32px; }
+  .promises { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .cards.four, .cards.three, .promises { grid-template-columns: 1fr; }
+  .thought:nth-child(2), .thought:nth-child(3) { margin-inline-start: 0; }
+  .join-strip { padding: 22px; }
+  .dock > span { display: none; }
+  .chat-log { height: 280px; }
+  section.final { padding: 44px 20px; }
+}
+</style><script>
+(function () {
+  var root = document.documentElement;
+  function set(l) {
+    root.setAttribute('data-lang', l); root.lang = l; root.dir = l === 'he' ? 'rtl' : 'ltr';
+    try { localStorage.setItem('nova-lang', l); } catch (e) {}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('nova-lang'); } catch (e) {}
+  set(location.hash === '#en' ? 'en' : location.hash === '#he' ? 'he' : (saved === 'en' ? 'en' : 'he'));
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-set-lang]');
+    if (b) set(b.getAttribute('data-set-lang'));
+  });
+})();
+</script></head><body><div class="sky" id="top">
+<span class="glow" aria-hidden="true" style="--c:#5B2350;--s:1.6;--x:0.15;--y:0.1;--o:0.35;--d:21s;--k:1.1;--dx:0.05;--dy:0.019"></span>
+<span class="glow" aria-hidden="true" style="--c:#E8437E;--s:1.1;--x:0.95;--y:0.05;--o:0.24;--d:16s;--k:1.12;--dx:-0.091;--dy:0.036"></span>
+<span class="glow" aria-hidden="true" style="--c:#FF7FA9;--s:0.8;--x:0.9;--y:0.95;--o:0.18;--d:23s;--k:1.08;--dx:-0.075;--dy:-0.044"></span>
+<span class="rise" aria-hidden="true" style="--s:0.26;--x:0.1;--o:0.1;--d:44s;--f:0.15;--t:1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.16;--x:0.74;--o:0.08;--d:36s;--f:0.6;--t:-1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.38;--x:0.48;--o:0.06;--d:58s;--f:0.35;--t:1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.11;--x:0.32;--o:0.12;--d:31s;--f:0.82;--t:-1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="./" aria-label="Nova"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gindex" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF7FA9"/><stop offset="1" stop-color="#E8437E"/></linearGradient><mask id="mindex" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z" fill="#fff"/><path d="M37 64L37 41Q37 36 40.4 39.66L59.6 60.34Q63 64 63 59L63 36" fill="none" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect width="100" height="100" fill="url(#gindex)" mask="url(#mindex)"/></svg><span data-l="he">נובה</span><span data-l="en">Nova</span></a>
+    <nav>
+      <a class="hide-sm" href="#thoughts" data-l="he">מחשבות</a><a class="hide-sm" href="#thoughts" data-l="en">Thoughts</a>
+      <a class="hide-sm" href="#sharing" data-l="he">שיתוף</a><a class="hide-sm" href="#sharing" data-l="en">Sharing</a>
+      <a href="#privacy" data-l="he">פרטיות</a><a href="#privacy" data-l="en">Privacy</a>
+      <button class="lang" type="button" data-set-lang="en" data-l="he" lang="en">English</button>
+      <button class="lang" type="button" data-set-lang="he" data-l="en" lang="he">עברית</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow" data-l="he">בבדיקה פרטית · אנדרואיד</span>
+      <span class="eyebrow" data-l="en">In private testing · Android</span>
+      <h1 data-l="he">העוזרת האישית שלך <em>לניירת</em></h1>
+      <h1 data-l="en">Your personal <em>paperwork</em> assistant</h1>
+      <p class="lede" data-l="he">מעלים מסמך או מצלמים אותו, ונובה קוראת אותו בשבילכם: מוצאת את התאריכים, הסכומים והפרטים החשובים, ומסדרת אותו בתיקייה הנכונה. אחר כך פשוט שואלים, בכתב או בקול.</p>
+      <p class="lede" data-l="en">Upload a document or snap a photo of it, and Nova reads it for you: she finds the dates, the amounts and the details that matter, and files it in the right folder. Then you just ask, by typing or out loud.</p>
+      <div class="cta">
+        <a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hinova.app@gmail.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
+      </div>
+    </div>
+
+    <!-- A conversation across documents: played by the script below; this first exchange is what shows at rest. -->
+    <div class="chat" aria-label="Example" data-chat>
+      <div class="chat-head">
+        <span class="who"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gindexs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF7FA9"/><stop offset="1" stop-color="#E8437E"/></linearGradient><mask id="mindexs" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z" fill="#fff"/><path d="M37 64L37 41Q37 36 40.4 39.66L59.6 60.34Q63 64 63 59L63 36" fill="none" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></mask></defs><rect width="100" height="100" fill="url(#gindexs)" mask="url(#mindexs)"/></svg><span data-l="he">נובה</span><span data-l="en">Nova</span></span>
+        <span class="tag" data-l="he">דוגמה</span><span class="tag" data-l="en">Example</span>
+      </div>
+      <div class="chat-log" data-log>
+        <div class="turn" data-l="he">
+          <div class="bubble q">עד מתי ביטוח הרכב בתוקף?</div>
+          <div class="bubble a"><span>עד <strong>14 במרץ 2027</strong></span><span class="source">פוליסת ביטוח רכב · עמוד 1</span></div>
+        </div>
+        <div class="turn" data-l="en">
+          <div class="bubble q">When does my car insurance run out?</div>
+          <div class="bubble a"><span>On <strong>14 March 2027</strong></span><span class="source">Car insurance policy · page 1</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+<main class="sheet">
+<div class="wrap">
+
+  <section class="block" id="what">
+    <span class="kicker" data-l="he">מה נובה עושה</span><span class="kicker" data-l="en">What Nova does</span>
+    <h2 data-l="he">כל הניירת שלכם, במקום אחד שמבין אותה</h2>
+    <h2 data-l="en">All your paperwork, in one place that understands it</h2>
+    <div class="cards four">
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4.5 4.5v11a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z"/><path d="M13.5 3.5V8.5h5M9 12.5h6M9 16h4.5"/></svg></span>
+        <h3 data-l="he">קוראת ומסדרת</h3><h3 data-l="en">Reads and files</h3>
+        <p data-l="he">PDF או תמונה (JPEG, PNG, WebP, HEIC). נובה מוצאת תאריכים, סכומים ופרטים, ומתייקת כל מסמך בתיקייה של הרכב, הדירה או האדם שהוא שייך אליו.</p>
+        <p data-l="en">A PDF or a photo (JPEG, PNG, WebP, HEIC). Nova finds the dates, amounts and details, and files each document in the folder of the car, home or person it belongs to.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 17 16h-6.5L6 19.5V16h-1A1.5 1.5 0 0 1 3.5 14.5"/><path d="M8.5 9h7M8.5 12h4.5"/></svg></span>
+        <h3 data-l="he">עונה, ומראה מאיפה</h3><h3 data-l="en">Answers, with the source</h3>
+        <p data-l="he">שואלים על המסמכים, ונובה עונה מתוכם ומראה באיזה מסמך ובאיזה עמוד מצאה את התשובה.</p>
+        <p data-l="en">Ask about your documents, and Nova answers from them, showing which document and page the answer came from.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5M9 20.5h6"/></svg></span>
+        <h3 data-l="he">מדברת איתכם</h3><h3 data-l="en">Talks with you</h3>
+        <p data-l="he">אפשר פשוט להתקשר אליה ולשאול. נובה עונה בקול, ואפשר לקטוע אותה כמו בשיחה רגילה.</p>
+        <p data-l="en">You can simply call her and ask. Nova answers out loud, and you can interrupt her like in any conversation.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2.2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M8.5 14h2.5"/></svg></span>
+        <h3 data-l="he">בקרוב</h3><h3 data-l="en">Coming up</h3>
+        <p data-l="he">מסך אחד שמראה מה עומד לפוג או להתחדש, כדי ששום דבר לא יפתיע אתכם.</p>
+        <p data-l="en">One screen showing what's about to expire or renew, so nothing takes you by surprise.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block split" id="thoughts">
+    <div>
+      <span class="kicker" data-l="he">המחשבות של נובה</span><span class="kicker" data-l="en">Nova's thoughts</span>
+      <h2 data-l="he">נובה שמה לב בשבילכם</h2>
+      <h2 data-l="en">Nova notices things for you</h2>
+      <p class="sub" data-l="he">אחרי שנובה קוראת מסמך, היא לפעמים מוצאת בו פרט שלא חיפשתם, ומספרת לכם בלי שביקשתם: כיסוי שלא ידעתם שיש לכם, אפשרות להאריך חוזה, תנאי שמסתתר בעמוד 3.</p>
+      <p class="sub" data-l="en">After Nova reads a document, she sometimes finds a detail you weren't looking for and tells you, unasked: cover you didn't know you had, an option to extend a contract, a condition hiding on page 3.</p>
+      <ul class="ticks">
+        <li><span data-l="he"><b>רק מה שכתוב.</b> כל מחשבה נשענת על שורה מהמסמך, ונובה מראה לכם בדיוק איזו.</span><span data-l="en"><b>Only what it says.</b> Every thought rests on a line in the document, and Nova shows you exactly which.</span></li>
+        <li><span data-l="he"><b>בלי עצות.</b> היא מספרת מה כתוב, ולא אומרת לכם מה לעשות.</span><span data-l="en"><b>No advice.</b> She tells you what it says, never what to do.</span></li>
+        <li><span data-l="he"><b>בשליטתכם.</b> לא מעניין אתכם? מכבים את המחשבות בהגדרות.</span><span data-l="en"><b>Your call.</b> Not for you? Turn thoughts off in Settings.</span></li>
+      </ul>
+    </div>
+    <div class="thoughts">
+      <article class="thought">
+        <span class="thought-head"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17.5h5.2v-1.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/></svg><span data-l="he">לנובה יש מחשבה</span><span data-l="en">Nova has a thought</span></span>
+        <p data-l="he">הפוליסה מכסה גם שמשות ומראות, עד <strong>₪1,500</strong> לתביעה.</p>
+        <p data-l="en">The policy also covers windows and mirrors, up to <strong>₪1,500</strong> a claim.</p>
+        <span class="source" data-l="he">פוליסת ביטוח רכב · עמוד 2</span><span class="source" data-l="en">Car insurance policy · page 2</span>
+      </article>
+      <article class="thought">
+        <span class="thought-head"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17.5h5.2v-1.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/></svg><span data-l="he">לנובה יש מחשבה</span><span data-l="en">Nova has a thought</span></span>
+        <p data-l="he">לפי החוזה אפשר להאריך את השכירות בשנה נוספת, אם מודיעים עד <strong>60 יום</strong> לפני הסיום.</p>
+        <p data-l="en">Under the contract, the lease can be extended by another year if you give notice <strong>60 days</strong> before it ends.</p>
+        <span class="source" data-l="he">חוזה שכירות · עמוד 3</span><span class="source" data-l="en">Lease agreement · page 3</span>
+      </article>
+      <article class="thought">
+        <span class="thought-head"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17.5h5.2v-1.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/></svg><span data-l="he">לנובה יש מחשבה</span><span data-l="en">Nova has a thought</span></span>
+        <p data-l="he">האחריות מתארכת ל<strong>שנתיים</strong> כשרושמים את המוצר באתר היצרן בתוך 30 יום מהקנייה.</p>
+        <p data-l="en">The warranty extends to <strong>two years</strong> when the product is registered on the maker's site within 30 days of purchase.</p>
+        <span class="source" data-l="he">תעודת אחריות · עמוד 1</span><span class="source" data-l="en">Warranty certificate · page 1</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="join-strip" aria-label="Join">
+    <div>
+      <h2 data-l="he">הצטרפו לקהילת הבודקים הראשונים שלנו</h2>
+      <h2 data-l="en">Join the community of our first testers</h2>
+      <p data-l="he">נסו את נובה לפני כולם, וספרו לנו מה אתם חושבים.</p>
+      <p data-l="en">Try Nova before anyone else, and tell us what you think.</p>
+    </div>
+    <div class="cta"><a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hinova.app@gmail.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
+  </section>
+
+  <section class="block" id="sharing">
+    <span class="kicker" data-l="he">שיתוף</span><span class="kicker" data-l="en">Sharing</span>
+    <h2 data-l="he">שיתוף שחוסך לכם טלפונים</h2>
+    <h2 data-l="en">Sharing that saves you the phone calls</h2>
+    <p class="sub" data-l="he">אתם מנהלים את העניינים, ואתם מחליטים מי עוד רואה אותם. משתפים תיקייה, ומי שקיבל אותה יכול לשאול את נובה בעצמו, במקום לשאול אתכם.</p>
+    <p class="sub" data-l="en">You run things, and you decide who else gets to see them. Share a folder, and whoever you share it with can ask Nova themselves, instead of asking you.</p>
+    <div class="cards four">
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5.2 6-5.2s5.4 1.9 6 5.2"/><path d="M15.5 5a3 3 0 0 1 0 6M17.5 14.6c1.9.6 3.1 2.3 3.5 4.9"/></svg></span>
+        <h3 data-l="he">בני ובנות זוג</h3><h3 data-l="en">Partners</h3>
+        <p data-l="he">תיקיית השיפוץ עם הצעות המחיר וחוזה הקבלן, או חוזה השכירות או הליסינג: שניכם רואים את אותם מסמכים, ושניכם יכולים לשאול את נובה.</p>
+        <p data-l="en">The renovation folder with the quotes and the contractor's agreement, or the rental or leasing contract: you both see the same documents, and you can both ask Nova.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V9.5"/><path d="M10 20.5v-5h4v5"/></svg></span>
+        <h3 data-l="he">בעלי דירות, שוכרים ושותפים</h3><h3 data-l="en">Landlords, tenants and roommates</h3>
+        <p data-l="he">בעל הדירה והשוכר רואים את אותו חוזה, את הביטוח ואת הקבלות, ושניהם יכולים לשאול את נובה מתי מתחדש החוזה או מה כלול בשכר הדירה. גם שותף לדירה יכול לחלוק איתכם כך את החשבונות.</p>
+        <p data-l="en">The landlord and the tenant see the same lease, insurance and receipts, and both can ask Nova when the lease renews or what the rent includes. A roommate can share the bills with you the same way.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2.2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3.5 12.5h17M12 11.5v2"/></svg></span>
+        <h3 data-l="he">עורכי דין ויועצים</h3><h3 data-l="en">Lawyers and advisors</h3>
+        <p data-l="he">משתפים עם הלקוח את התיקייה שלו, והוא שואל את נובה במקום להרים אליכם טלפון על כל שאלה קטנה. תנו ללקוחות שלכם את הכוח של נובה.</p>
+        <p data-l="en">Share a client's folder with them, and they ask Nova instead of calling you about every little question. Give your clients the power of Nova.</p>
+      </article>
+      <article class="card">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg></span>
+        <h3 data-l="he">אתם בשליטה</h3><h3 data-l="en">You're in control</h3>
+        <p data-l="he">משתפים בהזמנה במייל, תיקייה אחת עם אדם אחד. כל אחד מהצדדים יכול לצאת מהתיקייה בכל רגע, ותיקיית כספת אף פעם לא משותפת.</p>
+        <p data-l="en">You share by email invitation, one folder with one person. Either of you can leave the folder at any time, and a vault folder is never shared.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="privacy">
+    <span class="kicker" data-l="he">פרטיות</span><span class="kicker" data-l="en">Privacy</span>
+    <h2 data-l="he">אצלנו, הפרטיות שלכם קודמת לכל</h2>
+    <h2 data-l="en">At Nova, your privacy comes first</h2>
+    <div class="privacy-grid">
+      <article class="vault">
+        <span class="ico on-dark"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+        <h3 data-l="he">הכספת</h3><h3 data-l="en">The vault</h3>
+        <p data-l="he">תיקיות רגישות, כמו דרכונים או מסמכים רפואיים, נכנסות לכספת. היא נעולה, אפילו בפני נובה, עד שאתם פותחים אותה בסיסמה או בטביעת אצבע. אחרי 10 דקות היא ננעלת שוב מעצמה, והיא אף פעם לא משותפת.</p>
+        <p data-l="en">Sensitive folders, like passports or medical papers, go in the vault. It stays locked, even to Nova, until you open it with your password or fingerprint. After 10 minutes it locks again by itself, and it is never shared.</p>
+      </article>
+      <article class="card guard">
+        <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l7 2.6v5.2c0 4.4-2.9 7.7-7 9.2-4.1-1.5-7-4.8-7-9.2V6.1z"/><path d="M9 12.2l2.2 2.2 4-4"/></svg></span>
+        <h3 data-l="he">שומרים על הכניסה לחשבון</h3><h3 data-l="en">Guarding the way in</h3>
+        <ul class="ticks">
+          <li><span data-l="he">קוד אימות למייל בהרשמה.</span><span data-l="en">A verification code to your email when you sign up.</span></li>
+          <li><span data-l="he">מייל על כל כניסה ממכשיר חדש, עם שם המכשיר.</span><span data-l="en">An email for every sign-in from a new device, naming the device.</span></li>
+          <li><span data-l="he">סיסמה שגויה מאטה את הניסיונות הבאים, במקום לנעול אתכם מחוץ לחשבון.</span><span data-l="en">A wrong password slows down the next tries, instead of locking you out.</span></li>
+          <li><span data-l="he">אפשר להוסיף אפליקציית אימות, שמבקשת קוד בכל כניסה מטלפון חדש.</span><span data-l="en">You can add an authenticator app, which asks for a code on every new phone.</span></li>
+          <li><span data-l="he">לפני פעולה רגישה, כמו מחיקת החשבון, נובה מבקשת שוב את הסיסמה.</span><span data-l="en">Before a sensitive step, like deleting your account, Nova asks for your password again.</span></li>
+        </ul>
+      </article>
+    </div>
+    <ul class="promises">
+      <li><span data-l="he">רק אתם, ומי שאתם משתפים איתו תיקייה, רואים את המסמכים.</span><span data-l="en">Only you, and anyone you share a folder with, can see your documents.</span></li>
+      <li><span data-l="he">המסמכים שלכם לא משמשים לאימון מודלים של בינה מלאכותית.</span><span data-l="en">Your documents are not used to train AI models.</span></li>
+      <li><span data-l="he">המידע נשמר בשרתים באיחוד האירופי, וכל התקשורת מוצפנת.</span><span data-l="en">Your data is stored on servers in the EU, and all traffic is encrypted.</span></li>
+      <li><span data-l="he">אפשר למחוק מסמך, או את כל החשבון, בכל רגע.</span><span data-l="en">You can delete a document, or your whole account, at any time.</span></li>
+    </ul>
+    <a class="more" href="privacy.html" data-l="he">מדיניות הפרטיות המלאה</a>
+    <a class="more" href="privacy.html" data-l="en">The full privacy policy</a>
+  </section>
+
+  <section class="final sky" id="join">
+    <span class="glow" aria-hidden="true" style="--c:#5B2350;--s:1.6;--x:0.15;--y:0.1;--o:0.35;--d:21s;--k:1.1;--dx:0.05;--dy:0.019"></span>
+<span class="glow" aria-hidden="true" style="--c:#E8437E;--s:1.1;--x:0.95;--y:0.05;--o:0.24;--d:16s;--k:1.12;--dx:-0.091;--dy:0.036"></span>
+<span class="glow" aria-hidden="true" style="--c:#FF7FA9;--s:0.8;--x:0.9;--y:0.95;--o:0.18;--d:23s;--k:1.08;--dx:-0.075;--dy:-0.044"></span>
+<span class="rise" aria-hidden="true" style="--s:0.26;--x:0.1;--o:0.1;--d:44s;--f:0.15;--t:1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.16;--x:0.74;--o:0.08;--d:36s;--f:0.6;--t:-1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.38;--x:0.48;--o:0.06;--d:58s;--f:0.35;--t:1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+<span class="rise" aria-hidden="true" style="--s:0.11;--x:0.32;--o:0.12;--d:31s;--f:0.82;--t:-1"><svg viewBox="0 0 100 100"><path d="M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"/></svg></span>
+    <div class="final-in">
+      <h2 data-l="he">היו מהראשונים שמכירים את נובה</h2>
+      <h2 data-l="en">Be among the first to meet Nova</h2>
+      <p data-l="he">הצטרפו לקהילת הבודקים שלנו, נסו את נובה, וספרו לנו מה אתם חושבים. כל הערה עוזרת לנו לבנות אותה טוב יותר.</p>
+      <p data-l="en">Join our testers' community, try Nova, and tell us what you think. Every note helps us make her better.</p>
+      <div class="cta"><a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hinova.app@gmail.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
+      <small data-l="he">או כתבו לנו: <a href="mailto:hinova.app@gmail.com">hinova.app@gmail.com</a></small><small data-l="en">Or write to us: <a href="mailto:hinova.app@gmail.com">hinova.app@gmail.com</a></small>
+    </div>
+  </section>
+
+  <footer class="bottom">
+    <span>© 2026 <span data-l="he">נובה</span><span data-l="en">Nova</span></span>
+    <span><a href="privacy.html" data-l="he">מדיניות פרטיות</a><a href="privacy.html" data-l="en">Privacy policy</a> · <a href="mailto:hinova.app@gmail.com">hinova.app@gmail.com</a></span>
+  </footer>
+</div>
+</main>
+
+<!-- Once the hero is out of view, a slim bar keeps the way in close; it steps aside at the final call to action. -->
+<div class="dock" data-dock hidden>
+  <span data-l="he">הצטרפו לבודקים הראשונים</span><span data-l="en">Join our first testers</span>
+  <a class="btn sm" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt sm" href="mailto:hinova.app@gmail.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
+</div>
+
+<script>
+(function () {
+  var CHAT = {"he": [["עד מתי ביטוח הרכב בתוקף?", "עד <strong>14 במרץ 2027</strong>", "פוליסת ביטוח רכב · עמוד 1"], ["כמה זמן מראש צריך להודיע לבעל הדירה שעוזבים?", "<strong>60 יום</strong> מראש, בכתב.", "חוזה שכירות · עמוד 4"], ["כמה הופרש לפנסיה בתלוש של אוקטובר?", "<strong>₪1,240</strong> מהמעסיק ו־<strong>₪1,050</strong> מהשכר.", "תלוש שכר, אוקטובר · עמוד 1"], ["האחריות על המקרר עדיין בתוקף?", "כן, עד <strong>3 ביוני 2027</strong>", "תעודת אחריות · עמוד 1"], ["כמה עלתה הצעת המחיר של הקבלן?", "<strong>₪86,000</strong> כולל מע״מ, בשלושה תשלומים.", "הצעת מחיר לשיפוץ · עמוד 2"], ["מתי פג הדרכון של נועה?", "ב־<strong>22 בינואר 2027</strong>", "דרכון · עמוד 1"]], "en": [["When does my car insurance run out?", "On <strong>14 March 2027</strong>", "Car insurance policy · page 1"], ["How much notice do we give the landlord before moving out?", "<strong>60 days</strong>, in writing.", "Lease agreement · page 4"], ["How much went to my pension on the October pay slip?", "<strong>₪1,240</strong> from the employer and <strong>₪1,050</strong> from the salary.", "Pay slip, October · page 1"], ["Is the fridge still under warranty?", "Yes, until <strong>3 June 2027</strong>", "Warranty certificate · page 1"], ["How much was the contractor's quote?", "<strong>₪86,000</strong> including VAT, in three payments.", "Renovation quote · page 2"], ["When does Noa's passport expire?", "On <strong>22 January 2027</strong>", "Passport · page 1"]]};
+  var chat = document.querySelector('[data-chat]');
+  var log = chat && chat.querySelector('[data-log]');
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lang = function () { return document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'he'; };
+  var timers = [], i = 0, onScreen = true, playing = false;
+  function el(cls, htmlText) { var d = document.createElement('div'); d.className = cls; d.innerHTML = htmlText; return d; }
+  function answer(ex) { return el('bubble a', '<span>' + ex[1] + '</span><span class="source">' + ex[2] + '</span>'); }
+  function turn(ex, animate) {
+    var t = el('turn', ''); var q = el('bubble q', ex[0]); if (animate) q.classList.add('enter');
+    t.appendChild(q); if (!animate) t.appendChild(answer(ex)); return t;
+  }
+  function trim() { while (log.children.length > 3) log.removeChild(log.firstChild); }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function stop() { timers.forEach(clearTimeout); timers = []; playing = false; }
+  function step() {
+    if (!onScreen || document.hidden) { playing = false; return; }
+    playing = true;
+    var list = CHAT[lang()], ex = list[i % list.length]; i++;
+    var t = turn(ex, true); log.appendChild(t); trim();
+    later(function () {
+      var dots = el('typing enter', '<i></i><i></i><i></i>'); t.appendChild(dots);
+      later(function () { t.removeChild(dots); var a = answer(ex); a.classList.add('enter'); t.appendChild(a);
+        later(step, 3200); }, 1200);
+    }, 700);
+  }
+  function reset() {
+    if (!log) return;
+    stop(); log.innerHTML = ''; i = 0;
+    var list = CHAT[lang()];
+    log.appendChild(turn(list[0], false)); i = 1;
+    if (still) { log.appendChild(turn(list[1], false)); return; }
+    later(step, 2400);
+  }
+  if (log) {
+    reset();
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-set-lang]')) setTimeout(reset, 0); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { onScreen = es[0].isIntersecting; if (onScreen && !playing && !still) { stop(); later(step, 600); } }).observe(chat);
+    }
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && !playing && !still) { stop(); later(step, 600); } });
+  }
+
+  // The dock: visible between the hero and the final call to action.
+  var dock = document.querySelector('[data-dock]'), hero = document.getElementById('top'), fin = document.getElementById('join');
+  if (dock && hero && fin && 'IntersectionObserver' in window) {
+    var heroIn = true, finIn = false;
+    var update = function () { dock.hidden = heroIn || finIn; };
+    new IntersectionObserver(function (es) { heroIn = es[0].isIntersecting; update(); }).observe(hero);
+    new IntersectionObserver(function (es) { finIn = es[0].isIntersecting; update(); }).observe(fin);
+  }
+})();
+</script>
+</body></html>
