@@ -231,6 +231,11 @@ def main() -> None:
         "target": {"namespace": "android_app", "package_name": "com.hinova.app", "sha256_cert_fingerprints": SIGNING_CERTS},
     }], indent=2) + "\n")
     (site / "favicon.svg").write_text(FAVICON)
+    # The app's screens (sample data), for the gallery.
+    for d in (site / "img", preview / "img"):
+        d.mkdir(parents=True, exist_ok=True)
+        for f in (SRC / "img").glob("*.png"):
+            (d / f.name).write_bytes(f.read_bytes())
     (site / ".nojekyll").write_text("")          # GitHub Pages: serve /.well-known as is
     (site / "CNAME").write_text("hi-nova.com\n")
     # The preview: the landing page as the Artifact's page (no document shell), the policy as a full page beside it.
