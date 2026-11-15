@@ -15,6 +15,8 @@ SIGNING_CERTS = ["75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17
 # Google Analytics 4 (owner, 2026-11-15). Empty: no analytics anywhere, and the policy says nothing about it.
 GA_ID = os.environ.get("NOVA_GA_ID", "G-7MWNCDS4FL")  # property hi-nova.com, web stream (owner, 2026-11-15)
 WHATSAPP = os.environ.get("NOVA_WHATSAPP", "https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw")  # the testers' WhatsApp group (owner, 2026-11-14)
+# Nova's API: the request-access form posts to {API}/access-requests (owner, 2026-11-15).
+API = os.environ.get("NOVA_API", "https://novaapi-production-ebd4.up.railway.app")
 
 HEX = "M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"
 N = "M37 64L37 41Q37 36 40.4 39.66L59.6 60.34Q63 64 63 59L63 36"
@@ -107,7 +109,8 @@ def cta(small: bool = False) -> str:
     mail = f"mailto:{html.escape(CONTACT) if CONTACT else 'contact@hi-nova.com'}?subject={subject}"
     return (f'<a class="btn{sm}" href="{wa}" target="_blank" rel="noopener">{ICONS["group"]}'
             '<span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a>'
-            f'<a class="btn alt{sm}" href="{mail}">{ICONS["mail"]}'
+            # Opens the request-access form; the email link is the fallback without script.
+            f'<a class="btn alt{sm}" href="{mail}" data-access-open>{ICONS["mail"]}'
             '<span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>')
 
 # The hero conversation: questions across different documents, each answer with its source.
@@ -192,6 +195,7 @@ def fill(body: str, uid: str) -> str:
     out = (body.replace("{{SKY}}", sky()).replace("{{BADGE_SMALL}}", badge(uid + "s")).replace("{{BADGE}}", badge(uid))
                .replace("{{CTA_BUTTONS_SMALL}}", cta(small=True)).replace("{{CTA_BUTTONS}}", cta())
                .replace("{{CHAT_SCRIPT}}", CHAT_SCRIPT % json.dumps(CHAT, ensure_ascii=False))
+               .replace("{{ACCESS_POLICY_HE}}", ACCESS_POLICY["he"]).replace("{{ACCESS_POLICY_EN}}", ACCESS_POLICY["en"])
                .replace("{{CONTACT_RAW}}", html.escape(CONTACT) if CONTACT else "contact@hi-nova.com")
                .replace("{{CONTACT}}", f'<a href="mailto:{html.escape(CONTACT)}">{contact}</a>' if CONTACT else contact)
                .replace("{{OPERATOR}}", operator)
@@ -246,8 +250,8 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
     if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
     if (!window.gtag) return;
     var a = t.closest('a');
+    // request_access is sent by the form when a request is saved (ACCESS below), not on a click.
     if (a && /chat\\.whatsapp\\.com/.test(a.href)) gtag('event', 'join_whatsapp', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
-    else if (a && /^mailto:/.test(a.getAttribute('href') || '')) gtag('event', 'request_access', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
     var lang = t.closest('[data-set-lang]');
     if (lang) gtag('event', 'switch_language', { language: lang.getAttribute('data-set-lang') });
   });
@@ -261,6 +265,109 @@ SITE_POLICY = {
       <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>""",
 }
 
+ACCESS_POLICY = {
+    "he": """<h2 id="access">טופס בקשת הגישה</h2>
+      <p>כדי לבקש להצטרף לבדיקה, אתם ממלאים באתר שם, כתובת Gmail (חשבון ה-Google שבטלפון), סוג הטלפון, מי אתם (למשל אדם פרטי או עורכי דין) ואיך שמעתם על נובה. אנחנו משתמשים בפרטים רק כדי לצרף אתכם לבדיקה דרך Google Play (נוסיף את הכתובת לרשימת הבודקים שם), לחזור אליכם במייל, ולדעת מאיפה מגיעים אלינו. הפרטים נשמרים במסד הנתונים של נובה (Supabase) ונשלחים לתיבת הדואר שלנו (Resend). הם לא נמכרים ולא משמשים לפרסום. נשמור אותם עד סוף תקופת הבדיקה, או עד שתבקשו למחוק אותם: {{CONTACT}}.</p>""",
+    "en": """<h2 id="access-en">The request-access form</h2>
+      <p>To ask to join the test, you fill in your name, your Gmail address (the Google account on your phone), your type of phone, who you are (for example a private person or a lawyer) and how you heard about Nova. We use these details only to add you to the test through Google Play (we add the address to its list of testers), to get back to you by email, and to learn how people find us. They are stored in Nova's database (Supabase) and emailed to our inbox (Resend). They are never sold or used for advertising. We keep them until the test ends, or until you ask us to delete them: {{CONTACT}}.</p>""",
+}
+
+# The request-access form (owner, 2026-11-15): a dialog opened by every "request access" button. It posts to Nova's
+# API, which saves the request and emails it to Nova. Without <dialog> support or script, the button stays an email link.
+def chip(name: str, value: str, he: str, en: str, required: bool = False) -> str:
+    req = " required" if required else ""
+    label = f'<span data-l="he">{he}</span><span data-l="en">{en}</span>' if he != en else he
+    return f'<label class="chip"><input type="radio" name="{name}" value="{value}"{req}><span>{label}</span></label>'
+
+def access_dialog() -> str:
+    roles = [("individual", "אדם פרטי", "A private person"), ("lawyer", "עורך/ת דין", "Lawyer"), ("designer", "מעצב/ת פנים", "Interior designer"),
+             ("architect", "אדריכל/ית", "Architect"), ("landlord", "משכיר/ה דירה", "Landlord"), ("other", "אחר", "Other")]
+    sources = [("linkedin", "LinkedIn", "LinkedIn"), ("facebook", "Facebook", "Facebook"), ("instagram", "Instagram", "Instagram"),
+               ("friend", "חבר/ה", "A friend"), ("other", "אחר", "Other")]
+    wa = html.escape(WHATSAPP) if WHATSAPP else "#join"
+    return f"""<dialog class="access" id="access-dialog" data-access aria-labelledby="access-title">
+  <div class="access-body">
+    <button type="button" class="access-close" data-access-close><span aria-hidden="true">×</span><span class="sr" data-l="he">סגירה</span><span class="sr" data-l="en">Close</span></button>
+    <form class="access-form" data-access-form>
+      <h2 id="access-title"><span data-l="he">בקשת גישה לנובה</span><span data-l="en">Request access to Nova</span></h2>
+      <p class="access-lead"><span data-l="he">אנחנו פותחים מקומות בקבוצת הבודקים הראשונה, באנדרואיד. נחזור אליך במייל.</span><span data-l="en">We're opening places in the first testing group, on Android. We'll get back to you by email.</span></p>
+      <label class="field"><span class="field-label"><span data-l="he">שם</span><span data-l="en">Name</span></span>
+        <input type="text" name="name" required maxlength="100" autocomplete="name" autofocus></label>
+      <label class="field"><span class="field-label"><span data-l="he">כתובת Gmail</span><span data-l="en">Gmail address</span></span>
+        <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" dir="ltr">
+        <span class="field-hint"><span data-l="he">Google Play מצרף בודקים לפי חשבון ה-Google שבטלפון, אז כדאי לכתוב את הכתובת הזו.</span><span data-l="en">Google Play adds testers by the Google account on their phone, so please use that address.</span></span></label>
+      <fieldset class="field"><legend><span data-l="he">הטלפון שלך</span><span data-l="en">Your phone</span></legend>
+        <div class="chips">{chip("phone", "android", "Android", "Android", True)}{chip("phone", "iphone", "iPhone", "iPhone")}</div>
+        <p class="field-hint" data-iphone-hint hidden><span data-l="he">כרגע נובה זמינה רק באנדרואיד. ב-iPhone נכניס אותך לרשימת ההמתנה.</span><span data-l="en">Nova is Android-only for now. On iPhone, we'll put you on the waiting list.</span></p></fieldset>
+      <fieldset class="field"><legend><span data-l="he">מי את/ה?</span><span data-l="en">Who are you?</span></legend>
+        <div class="chips">{"".join(chip("role", v, he, en, i == 0) for i, (v, he, en) in enumerate(roles))}</div></fieldset>
+      <fieldset class="field"><legend><span data-l="he">איך שמעת על נובה?</span><span data-l="en">How did you hear about Nova?</span></legend>
+        <div class="chips">{"".join(chip("source", v, he, en, i == 0) for i, (v, he, en) in enumerate(sources))}</div></fieldset>
+      <input class="trap" type="text" name="extra" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="agree"><input type="checkbox" name="consent" required><span><span data-l="he">קראתי ואני מסכים/ה ל<a href="/privacy.html#access" target="_blank">מדיניות הפרטיות</a></span><span data-l="en">I agree to the <a href="/privacy.html#access-en" target="_blank">privacy policy</a></span></span></label>
+      <p class="access-error" data-access-error role="alert" hidden></p>
+      <button class="btn" type="submit" data-access-submit><span data-l="he">שליחה</span><span data-l="en">Send</span></button>
+    </form>
+    <div class="access-done" data-access-done hidden>
+      <h2><span data-l="he">תודה, קיבלנו!</span><span data-l="en">Thanks, we got it!</span></h2>
+      <p data-done="new" hidden><span data-l="he">נוסיף אותך לקבוצת הבודקים ונשלח הוראות התקנה לכתובת הזו.</span><span data-l="en">We'll add you to the testing group and email install instructions to this address.</span></p>
+      <p data-done="waitlist" hidden><span data-l="he">נכנסת לרשימת ההמתנה. נעדכן כשנובה תגיע ל-iPhone.</span><span data-l="en">You're on the waiting list. We'll let you know when Nova comes to iPhone.</span></p>
+      <p data-done="already" hidden><span data-l="he">הכתובת הזו כבר אצלנו ברשימה. נחזור אליך בקרוב.</span><span data-l="en">This address is already on our list. We'll be in touch soon.</span></p>
+      <p class="access-lead"><span data-l="he">בינתיים, מוזמנים לקבוצת הבודקים בווטסאפ.</span><span data-l="en">Meanwhile, you're welcome in the testers' WhatsApp group.</span></p>
+      <a class="btn" href="{wa}" target="_blank" rel="noopener">{ICONS["group"]}<span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a>
+    </div>
+  </div>
+</dialog>
+<script>
+(function () {{
+  var API = {json.dumps(API)}, CONTACT = {json.dumps(CONTACT or "")};
+  var dlg = document.querySelector('[data-access]');
+  if (!dlg || typeof dlg.showModal !== 'function' || !window.fetch) return;
+  var form = dlg.querySelector('[data-access-form]'), done = dlg.querySelector('[data-access-done]');
+  var err = dlg.querySelector('[data-access-error]'), submit = dlg.querySelector('[data-access-submit]');
+  var hint = dlg.querySelector('[data-iphone-hint]'), from = 'page';
+  var lang = function () {{ return document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'he'; }};
+  var MSG = {{
+    he: {{ bad: 'כדאי לבדוק את הפרטים ולנסות שוב.', busy: 'היו כאן הרבה בקשות. אפשר לנסות שוב בעוד שעה.', net: 'משהו השתבש. אפשר לנסות שוב, או לכתוב לנו: ' + CONTACT }},
+    en: {{ bad: 'Please check the details and try again.', busy: 'There were a lot of requests from here. Please try again in an hour.', net: 'Something went wrong. Please try again, or write to us: ' + CONTACT }}
+  }};
+  function picked(n) {{ var c = form.querySelector('[name="' + n + '"]:checked'); return c ? c.value : ''; }}
+  function field(n) {{ return form.elements.namedItem(n); }}
+  function fail(kind) {{ err.textContent = MSG[lang()][kind]; err.hidden = false; }}
+  function open(from_) {{
+    from = from_; form.hidden = false; done.hidden = true; err.hidden = true; submit.disabled = false;
+    dlg.showModal();
+    if (window.gtag) gtag('event', 'access_form_open', {{ link_location: from }});
+  }}
+  document.addEventListener('click', function (e) {{
+    var t = e.target.closest ? e.target : null; if (!t) return;
+    var b = t.closest('[data-access-open]');
+    if (b) {{ e.preventDefault(); open(b.closest('[id]') ? b.closest('[id]').id : 'page'); return; }}
+    if (t.closest('[data-access-close]')) dlg.close();
+  }});
+  dlg.addEventListener('click', function (e) {{ if (e.target === dlg) dlg.close(); }});
+  form.addEventListener('change', function () {{ hint.hidden = picked('phone') !== 'iphone'; }});
+  form.addEventListener('submit', function (e) {{
+    e.preventDefault();
+    var body = {{ name: field('name').value, email: field('email').value, phone: picked('phone'), role: picked('role'),
+                 source: picked('source'), lang: lang(), consent: field('consent').checked, extra: field('extra').value }};
+    submit.disabled = true; err.hidden = true;
+    fetch(API + '/access-requests', {{ method: 'POST', headers: {{ 'Content-Type': 'application/json' }}, body: JSON.stringify(body) }})
+      .then(function (r) {{ return r.json().catch(function () {{ return {{}}; }}).then(function (j) {{ return {{ status: r.status, body: j }}; }}); }})
+      .then(function (res) {{
+        submit.disabled = false;
+        if (res.status !== 200 && res.status !== 201) {{ fail(res.status === 429 ? 'busy' : res.status === 400 ? 'bad' : 'net'); return; }}
+        var d = (res.body && res.body.data) || {{}};
+        var kind = d.alreadyListed ? 'already' : d.waitlist ? 'waitlist' : 'new';
+        [].forEach.call(done.querySelectorAll('[data-done]'), function (p) {{ p.hidden = p.getAttribute('data-done') !== kind; }});
+        form.hidden = true; done.hidden = false; form.reset(); hint.hidden = true;
+        if (window.gtag && !d.alreadyListed) gtag('event', 'request_access', {{ role: body.role, source: body.source, phone: body.phone, link_location: from }});
+      }})
+      .catch(function () {{ submit.disabled = false; fail('net'); }});
+  }});
+}})();
+</script>"""
+
 def head(name: str, css: str, favicon_href: str) -> str:
     p = PAGES[name]
     return (f'<title>{p["title"]}</title>'
@@ -271,6 +378,8 @@ def head(name: str, css: str, favicon_href: str) -> str:
 
 def standalone(name: str, css: str, favicon_href: str, analytics: bool = True) -> str:
     body = fill((SRC / f"{name}.body.html").read_text(), name)
+    if "data-access-open" in body:
+        body += access_dialog()
     on = analytics and bool(GA_ID)
     return ('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
@@ -298,7 +407,7 @@ def main() -> None:
     (site / "CNAME").write_text("hi-nova.com\n")
     # The preview: the landing page as the Artifact's page (no document shell), the policy as a full page beside it.
     favicon_data = "data:image/svg+xml," + FAVICON.replace("#", "%23").replace('"', "'")
-    body = fill((SRC / "index.body.html").read_text(), "index")
+    body = fill((SRC / "index.body.html").read_text(), "index") + access_dialog()
     (preview / "index.html").write_text(head("index", css, favicon_data) + body + "\n")
     (preview / "privacy.html").write_text(standalone("privacy", css, favicon_data, analytics=False))
     print("built", sorted(str(p.relative_to(ROOT)) for p in site.iterdir()), sorted(str(p.relative_to(ROOT)) for p in preview.iterdir()))

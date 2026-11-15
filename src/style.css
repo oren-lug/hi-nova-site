@@ -297,3 +297,37 @@ footer.bottom { padding-bottom: 96px; }
   padding: 16px 18px; display: grid; gap: 12px; box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45); font-size: 0.95rem; }
 .consent a { color: var(--pink); }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* The request-access form: a dialog over the page, a sheet from the bottom on phones. */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.access { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 0; border: 1px solid var(--border);
+  border-radius: 22px; background: var(--surface); color: var(--text); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55); }
+.access::backdrop { background: rgba(17, 17, 20, 0.55); }
+.access-body { position: relative; padding: 26px 24px 24px; }
+.access-form, .access-done { display: grid; gap: 16px; }
+.access h2 { font-size: 1.45rem; padding-inline-end: 44px; }
+.access-lead, .field-hint { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.access-close { position: absolute; top: 16px; inset-inline-end: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--nav); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer; }
+.field { display: grid; gap: 6px; min-width: 0; border: 0; padding: 0; margin: 0; }
+.field-label, .field legend { font-family: var(--heading); font-weight: 500; font-size: 0.98rem; padding: 0; }
+.field legend { margin-bottom: 8px; }
+.field input[type="text"], .field input[type="email"] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 14px; width: 100%; }
+.field input[type="text"]:focus-visible, .field input[type="email"]:focus-visible { outline: 2px solid var(--pink); outline-offset: 1px; }
+.access .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: inline-flex; }
+.chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.chip > span { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); font-size: 0.95rem; }
+.chip input:checked + span { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip input:focus-visible + span { outline: 2px solid var(--pink); outline-offset: 2px; }
+.agree { display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.5; }
+.agree input { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--pink); }
+.trap { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; inset-inline-start: -9999px; }
+.access-error { background: color-mix(in srgb, var(--pink) 12%, transparent); border-radius: 12px; padding: 10px 14px; font-size: 0.95rem; }
+.access .btn { justify-content: center; font-size: 1rem; cursor: pointer; }
+.access .btn:disabled { opacity: 0.6; cursor: progress; }
+@media (max-width: 560px) {
+  .access { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 22px 22px 0 0; max-height: 92dvh; }
+  .access-body { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}

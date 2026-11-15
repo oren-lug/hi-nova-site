@@ -297,6 +297,40 @@ footer.bottom { padding-bottom: 96px; }
   padding: 16px 18px; display: grid; gap: 12px; box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45); font-size: 0.95rem; }
 .consent a { color: var(--pink); }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* The request-access form: a dialog over the page, a sheet from the bottom on phones. */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.access { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 0; border: 1px solid var(--border);
+  border-radius: 22px; background: var(--surface); color: var(--text); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.55); }
+.access::backdrop { background: rgba(17, 17, 20, 0.55); }
+.access-body { position: relative; padding: 26px 24px 24px; }
+.access-form, .access-done { display: grid; gap: 16px; }
+.access h2 { font-size: 1.45rem; padding-inline-end: 44px; }
+.access-lead, .field-hint { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.access-close { position: absolute; top: 16px; inset-inline-end: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--nav); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer; }
+.field { display: grid; gap: 6px; min-width: 0; border: 0; padding: 0; margin: 0; }
+.field-label, .field legend { font-family: var(--heading); font-weight: 500; font-size: 0.98rem; padding: 0; }
+.field legend { margin-bottom: 8px; }
+.field input[type="text"], .field input[type="email"] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 14px; width: 100%; }
+.field input[type="text"]:focus-visible, .field input[type="email"]:focus-visible { outline: 2px solid var(--pink); outline-offset: 1px; }
+.access .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; display: inline-flex; }
+.chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.chip > span { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); font-size: 0.95rem; }
+.chip input:checked + span { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip input:focus-visible + span { outline: 2px solid var(--pink); outline-offset: 2px; }
+.agree { display: flex; gap: 10px; align-items: flex-start; font-size: 0.95rem; line-height: 1.5; }
+.agree input { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--pink); }
+.trap { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; inset-inline-start: -9999px; }
+.access-error { background: color-mix(in srgb, var(--pink) 12%, transparent); border-radius: 12px; padding: 10px 14px; font-size: 0.95rem; }
+.access .btn { justify-content: center; font-size: 1rem; cursor: pointer; }
+.access .btn:disabled { opacity: 0.6; cursor: progress; }
+@media (max-width: 560px) {
+  .access { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 22px 22px 0 0; max-height: 92dvh; }
+  .access-body { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
 </style><script>
 (function () {
   var root = document.documentElement;
@@ -332,7 +366,7 @@ footer.bottom { padding-bottom: 96px; }
   </header>
   <div class="doc-head">
     <h1 data-l="he">מדיניות פרטיות</h1><h1 data-l="en">Privacy policy</h1>
-    <p class="updated" data-l="he">עודכנה לאחרונה: 14 בנובמבר 2026</p><p class="updated" data-l="en">Last updated: 14 November 2026</p>
+    <p class="updated" data-l="he">עודכנה לאחרונה: 15 בנובמבר 2026</p><p class="updated" data-l="en">Last updated: 15 November 2026</p>
   </div>
 </div>
 </div>
@@ -408,6 +442,9 @@ footer.bottom { padding-bottom: 96px; }
 
       <h2 id="site">האתר hi-nova.com</h2>
       <p>באתר אנחנו משתמשים ב-Google Analytics כדי לספור ביקורים ולהבין אילו חלקים בו עוזרים, למשל כמה אנשים מבקשים להצטרף לבדיקה. Google Analytics שומר עוגיות רק אם אישרת זאת בהודעה שמופיעה באתר; אחרת הוא מקבל רק אותות בסיסיים בלי עוגיות. המידע הזה לא קשור לחשבון בנובה ולא למסמכים, ולא משמש לפרסום. אפשר לשנות את הבחירה בכל רגע דרך "הגדרות עוגיות" בתחתית האתר.</p>
+
+      <h2 id="access">טופס בקשת הגישה</h2>
+      <p>כדי לבקש להצטרף לבדיקה, אתם ממלאים באתר שם, כתובת Gmail (חשבון ה-Google שבטלפון), סוג הטלפון, מי אתם (למשל אדם פרטי או עורכי דין) ואיך שמעתם על נובה. אנחנו משתמשים בפרטים רק כדי לצרף אתכם לבדיקה דרך Google Play (נוסיף את הכתובת לרשימת הבודקים שם), לחזור אליכם במייל, ולדעת מאיפה מגיעים אלינו. הפרטים נשמרים במסד הנתונים של נובה (Supabase) ונשלחים לתיבת הדואר שלנו (Resend). הם לא נמכרים ולא משמשים לפרסום. נשמור אותם עד סוף תקופת הבדיקה, או עד שתבקשו למחוק אותם: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a>.</p>
 
       <h2>גיל</h2>
       <p>נובה מיועדת לבני 18 ומעלה.</p>
@@ -485,6 +522,9 @@ footer.bottom { padding-bottom: 96px; }
       <h2 id="site-en">The hi-nova.com website</h2>
       <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>
 
+      <h2 id="access-en">The request-access form</h2>
+      <p>To ask to join the test, you fill in your name, your Gmail address (the Google account on your phone), your type of phone, who you are (for example a private person or a lawyer) and how you heard about Nova. We use these details only to add you to the test through Google Play (we add the address to its list of testers), to get back to you by email, and to learn how people find us. They are stored in Nova's database (Supabase) and emailed to our inbox (Resend). They are never sold or used for advertising. We keep them until the test ends, or until you ask us to delete them: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a>.</p>
+
       <h2>Age</h2>
       <p>Nova is meant for people aged 18 and over.</p>
 
@@ -524,8 +564,8 @@ footer.bottom { padding-bottom: 96px; }
     if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
     if (!window.gtag) return;
     var a = t.closest('a');
+    // request_access is sent by the form when a request is saved (ACCESS below), not on a click.
     if (a && /chat\.whatsapp\.com/.test(a.href)) gtag('event', 'join_whatsapp', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
-    else if (a && /^mailto:/.test(a.getAttribute('href') || '')) gtag('event', 'request_access', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
     var lang = t.closest('[data-set-lang]');
     if (lang) gtag('event', 'switch_language', { language: lang.getAttribute('data-set-lang') });
   });
