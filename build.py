@@ -12,6 +12,8 @@ OPERATOR = os.environ.get("NOVA_OPERATOR", "Oren Lugashi")  # operates Nova; the
 # The app's signing certificates (SHA-256). EAS's key signs the sideloaded APK and uploads to Play; add Google
 # Play's app-signing key here once Play Console shows it (Setup → App signing).
 SIGNING_CERTS = ["75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D"]
+# Google Analytics 4 (owner, 2026-11-15). Empty: no analytics anywhere, and the policy says nothing about it.
+GA_ID = os.environ.get("NOVA_GA_ID", "")
 WHATSAPP = os.environ.get("NOVA_WHATSAPP", "https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw")  # the testers' WhatsApp group (owner, 2026-11-14)
 
 HEX = "M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"
@@ -192,7 +194,10 @@ def fill(body: str, uid: str) -> str:
                .replace("{{CHAT_SCRIPT}}", CHAT_SCRIPT % json.dumps(CHAT, ensure_ascii=False))
                .replace("{{CONTACT_RAW}}", html.escape(CONTACT) if CONTACT else "contact@hi-nova.com")
                .replace("{{CONTACT}}", f'<a href="mailto:{html.escape(CONTACT)}">{contact}</a>' if CONTACT else contact)
-               .replace("{{OPERATOR}}", operator))
+               .replace("{{OPERATOR}}", operator)
+               .replace("{{COOKIE_LINK}}", ' · <a href="#" data-consent-open><span data-l="he">הגדרות עוגיות</span><span data-l="en">Cookie settings</span></a>' if GA_ID else '')
+               .replace("{{SITE_POLICY_HE}}", SITE_POLICY["he"] if GA_ID else '')
+               .replace("{{SITE_POLICY_EN}}", SITE_POLICY["en"] if GA_ID else ''))
     for name, svg in ICONS.items():
         out = out.replace("{{ICON_" + name + "}}", svg)
     assert "{{" not in out, out[out.index("{{"):out.index("{{") + 40]
@@ -204,6 +209,58 @@ PAGES = {
     "404": {"title": "Nova", "desc": "נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."},
 }
 
+# Consent first (Consent Mode v2, "advanced"): until a visitor accepts, Analytics sets no cookies and gets only
+# cookieless pings; ad storage is never granted. The choice is kept in this browser (nova-consent).
+def analytics_head() -> str:
+    if not GA_ID:
+        return ''
+    return (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>'
+            '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}'
+            "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});"
+            "var c=null;try{c=localStorage.getItem('nova-consent')}catch(e){}"
+            "if(c==='granted')gtag('consent','update',{analytics_storage:'granted'});"
+            f"gtag('js',new Date());gtag('config','{GA_ID}');</script>")
+
+CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
+  <p data-l="he">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים. <a href="/privacy.html#site">פרטים</a></p>
+  <p data-l="en">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents. <a href="/privacy.html#site">Details</a></p>
+  <div class="consent-actions">
+    <button type="button" class="btn sm" data-consent-choice="granted"><span data-l="he">מאשר/ת</span><span data-l="en">Accept</span></button>
+    <button type="button" class="btn alt sm" data-consent-choice="denied"><span data-l="he">לא, תודה</span><span data-l="en">No thanks</span></button>
+  </div>
+</div>
+<script>
+(function () {
+  var box = document.querySelector('[data-consent]'); if (!box) return;
+  var saved = null; try { saved = localStorage.getItem('nova-consent'); } catch (e) {}
+  if (!saved) box.hidden = false;
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target : null; if (!t) return;
+    var choice = t.closest('[data-consent-choice]');
+    if (choice) {
+      var v = choice.getAttribute('data-consent-choice');
+      try { localStorage.setItem('nova-consent', v); } catch (err) {}
+      if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
+      box.hidden = true; return;
+    }
+    if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
+    if (!window.gtag) return;
+    var a = t.closest('a');
+    if (a && /chat\\.whatsapp\\.com/.test(a.href)) gtag('event', 'join_whatsapp', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
+    else if (a && /^mailto:/.test(a.getAttribute('href') || '')) gtag('event', 'request_access', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
+    var lang = t.closest('[data-set-lang]');
+    if (lang) gtag('event', 'switch_language', { language: lang.getAttribute('data-set-lang') });
+  });
+})();
+</script>"""
+
+SITE_POLICY = {
+    "he": """<h2 id="site">האתר hi-nova.com</h2>
+      <p>באתר אנחנו משתמשים ב-Google Analytics כדי לספור ביקורים ולהבין אילו חלקים בו עוזרים, למשל כמה אנשים מבקשים להצטרף לבדיקה. Google Analytics שומר עוגיות רק אם אישרת זאת בהודעה שמופיעה באתר; אחרת הוא מקבל רק אותות בסיסיים בלי עוגיות. המידע הזה לא קשור לחשבון בנובה ולא למסמכים, ולא משמש לפרסום. אפשר לשנות את הבחירה בכל רגע דרך "הגדרות עוגיות" בתחתית האתר.</p>""",
+    "en": """<h2 id="site">The hi-nova.com website</h2>
+      <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>""",
+}
+
 def head(name: str, css: str, favicon_href: str) -> str:
     p = PAGES[name]
     return (f'<title>{p["title"]}</title>'
@@ -212,11 +269,12 @@ def head(name: str, css: str, favicon_href: str) -> str:
             f'<link rel="icon" href="{favicon_href}" type="image/svg+xml">'
             f'{FONTS}<style>{css}</style>{LANG_SCRIPT}')
 
-def standalone(name: str, css: str, favicon_href: str) -> str:
+def standalone(name: str, css: str, favicon_href: str, analytics: bool = True) -> str:
     body = fill((SRC / f"{name}.body.html").read_text(), name)
+    on = analytics and bool(GA_ID)
     return ('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
-            f'{head(name, css, favicon_href)}</head><body>{body}</body></html>\n')
+            f'{analytics_head() if on else ""}{head(name, css, favicon_href)}</head><body>{body}{CONSENT if on else ""}</body></html>\n')
 
 def main() -> None:
     css = (SRC / "style.css").read_text()
@@ -242,7 +300,7 @@ def main() -> None:
     favicon_data = "data:image/svg+xml," + FAVICON.replace("#", "%23").replace('"', "'")
     body = fill((SRC / "index.body.html").read_text(), "index")
     (preview / "index.html").write_text(head("index", css, favicon_data) + body + "\n")
-    (preview / "privacy.html").write_text(standalone("privacy", css, favicon_data))
+    (preview / "privacy.html").write_text(standalone("privacy", css, favicon_data, analytics=False))
     print("built", sorted(str(p.relative_to(ROOT)) for p in site.iterdir()), sorted(str(p.relative_to(ROOT)) for p in preview.iterdir()))
 
 main()
