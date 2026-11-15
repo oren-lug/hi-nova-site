@@ -1,4 +1,4 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Nova</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Rubik:wght@500&display=swap"><style>/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7MWNCDS4FL"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});var c=null;try{c=localStorage.getItem('nova-consent')}catch(e){}if(c==='granted')gtag('consent','update',{analytics_storage:'granted'});gtag('js',new Date());gtag('config','G-7MWNCDS4FL');</script><title>Nova</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Rubik:wght@500&display=swap"><style>/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
    Tokens are the app's own (mobile theme/tokens.ts, design V4 "Horizon"): warm paper, ink, Nova pink. */
 :root {
   --bg: #FBFAF7; --surface: #FFFFFF; --nav: #F3F1EC; --border: #ECE9E2; --text: #1C1D21; --muted: #6B6D74;
@@ -360,7 +360,7 @@ footer.bottom { padding-bottom: 96px; }
 
   <footer class="bottom">
     <span>© 2026 <span data-l="he">נובה</span><span data-l="en">Nova</span></span>
-    <span><a href="/privacy.html" data-l="he">מדיניות פרטיות</a><a href="/privacy.html" data-l="en">Privacy policy</a> · <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a></span>
+    <span><a href="/privacy.html" data-l="he">מדיניות פרטיות</a><a href="/privacy.html" data-l="en">Privacy policy</a> · <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a> · <a href="#" data-consent-open><span data-l="he">הגדרות עוגיות</span><span data-l="en">Cookie settings</span></a></span>
   </footer>
 </div>
 </main>
@@ -372,4 +372,35 @@ footer.bottom { padding-bottom: 96px; }
   document.querySelector('[data-missing]').hidden = true;
 })();
 </script>
-</body></html>
+<div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
+  <p data-l="he">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים. <a href="/privacy.html#site">פרטים</a></p>
+  <p data-l="en">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents. <a href="/privacy.html#site">Details</a></p>
+  <div class="consent-actions">
+    <button type="button" class="btn sm" data-consent-choice="granted"><span data-l="he">מאשר/ת</span><span data-l="en">Accept</span></button>
+    <button type="button" class="btn alt sm" data-consent-choice="denied"><span data-l="he">לא, תודה</span><span data-l="en">No thanks</span></button>
+  </div>
+</div>
+<script>
+(function () {
+  var box = document.querySelector('[data-consent]'); if (!box) return;
+  var saved = null; try { saved = localStorage.getItem('nova-consent'); } catch (e) {}
+  if (!saved) box.hidden = false;
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target : null; if (!t) return;
+    var choice = t.closest('[data-consent-choice]');
+    if (choice) {
+      var v = choice.getAttribute('data-consent-choice');
+      try { localStorage.setItem('nova-consent', v); } catch (err) {}
+      if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
+      box.hidden = true; return;
+    }
+    if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
+    if (!window.gtag) return;
+    var a = t.closest('a');
+    if (a && /chat\.whatsapp\.com/.test(a.href)) gtag('event', 'join_whatsapp', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
+    else if (a && /^mailto:/.test(a.getAttribute('href') || '')) gtag('event', 'request_access', { link_location: a.closest('[id]') ? a.closest('[id]').id : 'page' });
+    var lang = t.closest('[data-set-lang]');
+    if (lang) gtag('event', 'switch_language', { language: lang.getAttribute('data-set-lang') });
+  });
+})();
+</script></body></html>

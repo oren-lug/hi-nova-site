@@ -13,7 +13,7 @@ OPERATOR = os.environ.get("NOVA_OPERATOR", "Oren Lugashi")  # operates Nova; the
 # Play's app-signing key here once Play Console shows it (Setup → App signing).
 SIGNING_CERTS = ["75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D"]
 # Google Analytics 4 (owner, 2026-11-15). Empty: no analytics anywhere, and the policy says nothing about it.
-GA_ID = os.environ.get("NOVA_GA_ID", "")
+GA_ID = os.environ.get("NOVA_GA_ID", "G-7MWNCDS4FL")  # property hi-nova.com, web stream (owner, 2026-11-15)
 WHATSAPP = os.environ.get("NOVA_WHATSAPP", "https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw")  # the testers' WhatsApp group (owner, 2026-11-14)
 
 HEX = "M42.21 16.5Q50 12 57.79 16.5L75.11 26.5Q82.91 31 82.91 40L82.91 60Q82.91 69 75.11 73.5L57.79 83.5Q50 88 42.21 83.5L24.89 73.5Q17.09 69 17.09 60L17.09 40Q17.09 31 24.89 26.5Z"
