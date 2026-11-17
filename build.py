@@ -11,7 +11,9 @@ CONTACT = os.environ.get("NOVA_CONTACT", "hi@hi-nova.com")  # forwards (ImprovMX
 OPERATOR = os.environ.get("NOVA_OPERATOR", "Oren Lugashi")  # operates Nova; the Google developer account name (owner, 2026-11-14)
 # The app's signing certificates (SHA-256). EAS's key signs the sideloaded APK and uploads to Play; add Google
 # Play's app-signing key here once Play Console shows it (Setup → App signing).
-SIGNING_CERTS = ["75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D"]
+SIGNING_CERTS = ["75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D",
+                 # Google Play's app-signing key (read from Play's signed universal APK, 2026-11-18)
+                 "76:25:0F:71:86:C4:5E:DC:B5:D9:67:B7:C6:93:78:D0:22:20:F1:7D:FC:E8:A9:D9:CB:9A:CA:D9:4D:74:9D:BA"]
 # Google Analytics 4 (owner, 2026-11-15). Empty: no analytics anywhere, and the policy says nothing about it.
 GA_ID = os.environ.get("NOVA_GA_ID", "G-7MWNCDS4FL")  # property hi-nova.com, web stream (owner, 2026-11-15)
 WHATSAPP = os.environ.get("NOVA_WHATSAPP", "https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw")  # the testers' WhatsApp group (owner, 2026-11-14)
