@@ -8,7 +8,8 @@
       "namespace": "android_app",
       "package_name": "com.hinova.app",
       "sha256_cert_fingerprints": [
-        "75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D"
+        "75:89:65:B2:6A:42:CF:59:F4:B9:E7:99:EB:9B:54:D6:38:2F:83:24:17:6D:CF:08:AC:1A:D2:A6:3C:A3:32:9D",
+        "76:25:0F:71:86:C4:5E:DC:B5:D9:67:B7:C6:93:78:D0:22:20:F1:7D:FC:E8:A9:D9:CB:9A:CA:D9:4D:74:9D:BA"
       ]
     }
   }
