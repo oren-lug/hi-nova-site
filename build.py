@@ -209,11 +209,30 @@ def fill(body: str, uid: str) -> str:
     assert "{{" not in out, out[out.index("{{"):out.index("{{") + 40]
     return out
 
+SITE = "https://hi-nova.com"
+# "path" is the page's public address; link previews (LinkedIn, WhatsApp, Facebook, X) read the og:/twitter: tags.
 PAGES = {
-    "index": {"title": "Nova", "desc": "נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."},
-    "privacy": {"title": "Nova Privacy Policy", "desc": "מדיניות הפרטיות של נובה. Nova's privacy policy."},
-    "404": {"title": "Nova", "desc": "נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."},
+    "index": {"title": "Nova נובה · העוזרת האישית שלך לניירת", "path": "/",
+              "desc": "שואלים את נובה על המסמכים שלכם ומקבלים תשובה עם מקור. Ask Nova about your documents and get answers with sources."},
+    "privacy": {"title": "Nova Privacy Policy", "path": "/privacy.html", "desc": "מדיניות הפרטיות של נובה. Nova's privacy policy."},
+    "404": {"title": "Nova נובה", "path": "/", "desc": "נובה, העוזרת האישית שלך לניירת. Nova, your personal paperwork assistant."},
 }
+# The link-preview card: src/og.jpg, 1200x630 (scratchpad og/make_og.py renders it).
+OG_IMAGE = {"path": "/og.jpg", "w": 1200, "h": 630, "alt": "Nova נובה: העוזרת האישית שלך לניירת"}
+
+
+def social_meta(name: str) -> str:
+    p, e = PAGES[name], html.escape
+    url, img = SITE + p["path"], SITE + OG_IMAGE["path"]
+    tags = [("property", "og:type", "website"), ("property", "og:site_name", "Nova"), ("property", "og:url", url),
+            ("property", "og:title", p["title"]), ("property", "og:description", p["desc"]),
+            ("property", "og:image", img), ("property", "og:image:secure_url", img), ("property", "og:image:type", "image/jpeg"),
+            ("property", "og:image:width", str(OG_IMAGE["w"])), ("property", "og:image:height", str(OG_IMAGE["h"])),
+            ("property", "og:image:alt", OG_IMAGE["alt"]), ("property", "og:locale", "he_IL"),
+            ("property", "og:locale:alternate", "en_US"), ("name", "twitter:card", "summary_large_image"),
+            ("name", "twitter:title", p["title"]), ("name", "twitter:description", p["desc"]), ("name", "twitter:image", img)]
+    out = "".join(f'<meta {k}="{v}" content="{e(c)}">' for k, v, c in tags)
+    return out + (f'<link rel="canonical" href="{url}">' if name != "404" else "")
 
 # Consent first (Consent Mode v2, "advanced"): until a visitor accepts, Analytics sets no cookies and gets only
 # cookieless pings; ad storage is never granted. The choice is kept in this browser (nova-consent).
@@ -374,7 +393,7 @@ def head(name: str, css: str, favicon_href: str) -> str:
     p = PAGES[name]
     return (f'<title>{p["title"]}</title>'
             '<meta name="claude:viewport-fit-sides" content="cover">'
-            f'<meta name="description" content="{html.escape(p["desc"])}">'
+            f'<meta name="description" content="{html.escape(p["desc"])}">{social_meta(name)}'
             f'<link rel="icon" href="{favicon_href}" type="image/svg+xml">'
             f'{FONTS}<style>{css}</style>{LANG_SCRIPT}')
 
@@ -400,6 +419,7 @@ def main() -> None:
         "target": {"namespace": "android_app", "package_name": "com.hinova.app", "sha256_cert_fingerprints": SIGNING_CERTS},
     }], indent=2) + "\n")
     (site / "favicon.svg").write_text(FAVICON)
+    (site / "og.jpg").write_bytes((SRC / "og.jpg").read_bytes())  # the link-preview card
     # The app's screens (sample data), for the gallery.
     for d in (site / "img", preview / "img"):
         d.mkdir(parents=True, exist_ok=True)
