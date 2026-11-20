@@ -42,7 +42,7 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .cta { margin-top: 30px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .btn { display: inline-block; text-decoration: none; font-family: var(--heading); font-weight: 500; background: var(--text); color: var(--bg); padding: 12px 22px; border-radius: 14px; }
 .btn:hover { opacity: 0.9; }
-.cta small { color: var(--muted); font-size: 0.9rem; }
+.cta small { color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
 
 /* The sample answer: how a real answer looks, labelled as an example. */
 .sample { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 18px 40px -28px rgba(28, 29, 33, 0.35); }
@@ -297,6 +297,9 @@ footer.bottom { padding-bottom: 96px; }
   padding: 16px 18px; display: grid; gap: 12px; box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45); font-size: 0.95rem; }
 .consent a { color: var(--pink); }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.consent-short { display: none; }
+.consent-open .dock { display: none !important; }
+@media (max-width: 600px) { .consent-long { display: none; } .consent-short { display: inline; } .consent { padding: 12px 14px; gap: 10px; } }
 
 /* The request-access form: a dialog over the page, a sheet from the bottom on phones. */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -389,7 +392,7 @@ footer.bottom { padding-bottom: 96px; }
       <p data-l="he">נובה נמצאת כרגע בבדיקה פרטית לאנדרואיד. הצטרפו לקבוצת הבודקים או בקשו גישה, ונשלח לכם קישור.</p>
       <p data-l="en">Nova is in private testing on Android. Join the testers' group or request access, and we'll send you a link.</p>
     </div>
-    <div class="cta"><a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
+    <div class="cta"><a class="btn" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
   </section>
 
   <footer class="bottom">
@@ -488,8 +491,8 @@ footer.bottom { padding-bottom: 96px; }
   });
 })();
 </script><div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
-  <p data-l="he">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים. <a href="/privacy.html#site">פרטים</a></p>
-  <p data-l="en">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents. <a href="/privacy.html#site-en">Details</a></p>
+  <p data-l="he"><span class="consent-long">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים.</span><span class="consent-short">עוגיות לסטטיסטיקה בלבד, בלי פרסום.</span> <a href="/privacy.html#site">פרטים</a></p>
+  <p data-l="en"><span class="consent-long">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents.</span><span class="consent-short">Cookies for statistics only, no ads.</span> <a href="/privacy.html#site-en">Details</a></p>
   <div class="consent-actions">
     <button type="button" class="btn sm" data-consent-choice="granted"><span data-l="he">מאשר/ת</span><span data-l="en">Accept</span></button>
     <button type="button" class="btn alt sm" data-consent-choice="denied"><span data-l="he">לא, תודה</span><span data-l="en">No thanks</span></button>
@@ -499,7 +502,14 @@ footer.bottom { padding-bottom: 96px; }
 (function () {
   var box = document.querySelector('[data-consent]'); if (!box) return;
   var saved = null; try { saved = localStorage.getItem('nova-consent'); } catch (e) {}
-  if (!saved) box.hidden = false;
+  function set(open) { box.hidden = !open; document.documentElement.classList.toggle('consent-open', open); }
+  // Not over the first screen: after the visitor scrolls past the hero, or after 8 seconds.
+  if (!saved) {
+    var hero = document.querySelector('.hero'), timer = setTimeout(show, 8000);
+    function show() { clearTimeout(timer); window.removeEventListener('scroll', onScroll); if (!saved) set(true); }
+    function onScroll() { if (!hero || hero.getBoundingClientRect().bottom < 0) show(); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
   document.addEventListener('click', function (e) {
     var t = e.target.closest ? e.target : null; if (!t) return;
     var choice = t.closest('[data-consent-choice]');
@@ -507,9 +517,9 @@ footer.bottom { padding-bottom: 96px; }
       var v = choice.getAttribute('data-consent-choice');
       try { localStorage.setItem('nova-consent', v); } catch (err) {}
       if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
-      box.hidden = true; return;
+      saved = v; set(false); return;
     }
-    if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
+    if (t.closest('[data-consent-open]')) { e.preventDefault(); set(true); return; }
     if (!window.gtag) return;
     var a = t.closest('a');
     // request_access is sent by the form when a request is saved (ACCESS below), not on a click.
