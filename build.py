@@ -104,16 +104,22 @@ ICONS = {
     "mail": icon('<rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/>'),
 }
 
+# One primary call everywhere: request access (Stacy, 2026-11-18). A WhatsApp join leaves no Gmail address, so it
+# can't become a Play tester: the group is offered after a request is sent, and as a quiet line in the final section.
 def cta(small: bool = False) -> str:
     sm = " sm" if small else ""
-    wa = html.escape(WHATSAPP) if WHATSAPP else "#join"
     subject = "%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94"  # "בקשה לנסות את נובה"
     mail = f"mailto:{html.escape(CONTACT) if CONTACT else 'contact@hi-nova.com'}?subject={subject}"
-    return (f'<a class="btn{sm}" href="{wa}" target="_blank" rel="noopener">{ICONS["group"]}'
-            '<span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a>'
-            # Opens the request-access form; the email link is the fallback without script.
-            f'<a class="btn alt{sm}" href="{mail}" data-access-open>{ICONS["mail"]}'
+    # Opens the request-access form; the email link is the fallback without script.
+    return (f'<a class="btn{sm}" href="{mail}" data-access-open>{ICONS["mail"]}'
             '<span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>')
+
+def whatsapp_line() -> str:
+    if not WHATSAPP:
+        return ''
+    wa = html.escape(WHATSAPP)
+    return (f'<small data-l="he">כבר נרשמת? <a href="{wa}" target="_blank" rel="noopener">לקבוצת הבודקים בווטסאפ</a></small>'
+            f'<small data-l="en">Already signed up? <a href="{wa}" target="_blank" rel="noopener">Join the testers\' WhatsApp group</a></small>')
 
 # The hero conversation: questions across different documents, each answer with its source.
 CHAT = {
@@ -195,7 +201,7 @@ def fill(body: str, uid: str) -> str:
     contact = html.escape(CONTACT) if CONTACT else '<span class="fill">[contact email]</span>'
     operator = html.escape(OPERATOR) if OPERATOR else '<span class="fill">[operator name]</span>'
     out = (body.replace("{{SKY}}", sky()).replace("{{BADGE_SMALL}}", badge(uid + "s")).replace("{{BADGE}}", badge(uid))
-               .replace("{{CTA_BUTTONS_SMALL}}", cta(small=True)).replace("{{CTA_BUTTONS}}", cta())
+               .replace("{{CTA_BUTTONS_SMALL}}", cta(small=True)).replace("{{CTA_BUTTONS}}", cta()).replace("{{WHATSAPP_LINE}}", whatsapp_line())
                .replace("{{CHAT_SCRIPT}}", CHAT_SCRIPT % json.dumps(CHAT, ensure_ascii=False))
                .replace("{{ACCESS_POLICY_HE}}", ACCESS_POLICY["he"]).replace("{{ACCESS_POLICY_EN}}", ACCESS_POLICY["en"])
                .replace("{{CONTACT_RAW}}", html.escape(CONTACT) if CONTACT else "contact@hi-nova.com")
@@ -247,8 +253,8 @@ def analytics_head() -> str:
             f"gtag('js',new Date());gtag('config','{GA_ID}');</script>")
 
 CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
-  <p data-l="he">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים. <a href="/privacy.html#site">פרטים</a></p>
-  <p data-l="en">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents. <a href="/privacy.html#site-en">Details</a></p>
+  <p data-l="he"><span class="consent-long">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים.</span><span class="consent-short">עוגיות לסטטיסטיקה בלבד, בלי פרסום.</span> <a href="/privacy.html#site">פרטים</a></p>
+  <p data-l="en"><span class="consent-long">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents.</span><span class="consent-short">Cookies for statistics only, no ads.</span> <a href="/privacy.html#site-en">Details</a></p>
   <div class="consent-actions">
     <button type="button" class="btn sm" data-consent-choice="granted"><span data-l="he">מאשר/ת</span><span data-l="en">Accept</span></button>
     <button type="button" class="btn alt sm" data-consent-choice="denied"><span data-l="he">לא, תודה</span><span data-l="en">No thanks</span></button>
@@ -258,7 +264,14 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
 (function () {
   var box = document.querySelector('[data-consent]'); if (!box) return;
   var saved = null; try { saved = localStorage.getItem('nova-consent'); } catch (e) {}
-  if (!saved) box.hidden = false;
+  function set(open) { box.hidden = !open; document.documentElement.classList.toggle('consent-open', open); }
+  // Not over the first screen: after the visitor scrolls past the hero, or after 8 seconds.
+  if (!saved) {
+    var hero = document.querySelector('.hero'), timer = setTimeout(show, 8000);
+    function show() { clearTimeout(timer); window.removeEventListener('scroll', onScroll); if (!saved) set(true); }
+    function onScroll() { if (!hero || hero.getBoundingClientRect().bottom < 0) show(); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
   document.addEventListener('click', function (e) {
     var t = e.target.closest ? e.target : null; if (!t) return;
     var choice = t.closest('[data-consent-choice]');
@@ -266,9 +279,9 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
       var v = choice.getAttribute('data-consent-choice');
       try { localStorage.setItem('nova-consent', v); } catch (err) {}
       if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
-      box.hidden = true; return;
+      saved = v; set(false); return;
     }
-    if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
+    if (t.closest('[data-consent-open]')) { e.preventDefault(); set(true); return; }
     if (!window.gtag) return;
     var a = t.closest('a');
     // request_access is sent by the form when a request is saved (ACCESS below), not on a click.

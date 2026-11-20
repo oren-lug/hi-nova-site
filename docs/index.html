@@ -42,7 +42,7 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .cta { margin-top: 30px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .btn { display: inline-block; text-decoration: none; font-family: var(--heading); font-weight: 500; background: var(--text); color: var(--bg); padding: 12px 22px; border-radius: 14px; }
 .btn:hover { opacity: 0.9; }
-.cta small { color: var(--muted); font-size: 0.9rem; }
+.cta small { color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
 
 /* The sample answer: how a real answer looks, labelled as an example. */
 .sample { background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 22px; display: grid; gap: 14px; box-shadow: 0 18px 40px -28px rgba(28, 29, 33, 0.35); }
@@ -297,6 +297,9 @@ footer.bottom { padding-bottom: 96px; }
   padding: 16px 18px; display: grid; gap: 12px; box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.45); font-size: 0.95rem; }
 .consent a { color: var(--pink); }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.consent-short { display: none; }
+.consent-open .dock { display: none !important; }
+@media (max-width: 600px) { .consent-long { display: none; } .consent-short { display: inline; } .consent { padding: 12px 14px; gap: 10px; } }
 
 /* The request-access form: a dialog over the page, a sheet from the bottom on phones. */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -368,14 +371,16 @@ footer.bottom { padding-bottom: 96px; }
 
   <section class="hero">
     <div>
-      <span class="eyebrow" data-l="he">בבדיקה פרטית · אנדרואיד</span>
-      <span class="eyebrow" data-l="en">In private testing · Android</span>
+      <span class="eyebrow" data-l="he">100 מקומות ראשונים · אנדרואיד</span>
+      <span class="eyebrow" data-l="en">The first 100 places · Android</span>
       <h1 data-l="he">העוזרת האישית שלך <em>לניירת</em></h1>
       <h1 data-l="en">Your personal <em>paperwork</em> assistant</h1>
-      <p class="lede" data-l="he">מעלים מסמך או מצלמים אותו, ונובה קוראת אותו בשבילכם: מוצאת את התאריכים, הסכומים והפרטים החשובים, ומסדרת אותו בתיקייה הנכונה. אחר כך פשוט שואלים, בכתב או בקול.</p>
-      <p class="lede" data-l="en">Upload a document or snap a photo of it, and Nova reads it for you: she finds the dates, the amounts and the details that matter, and files it in the right folder. Then you just ask, by typing or out loud.</p>
+      <p class="lede" data-l="he">מצלמים מסמך, ונובה קוראת אותו, מסדרת אותו בתיקייה ועונה על השאלות שלכם, עם העמוד שממנו הגיעה התשובה. בכתב או בקול.</p>
+      <p class="lede" data-l="en">Snap a document, and Nova reads it, files it and answers your questions, with the page each answer came from. By typing or out loud.</p>
       <div class="cta">
-        <a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
+        <a class="btn" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
+        <small data-l="he">טופס של חצי דקה, ונחזור אליכם במייל עם הזמנה ל-Google&nbsp;Play. ב-iPhone? נרשום אתכם לרשימת ההמתנה.</small>
+        <small data-l="en">A half-minute form, and we'll email you an invitation to Google&nbsp;Play. On iPhone? We'll put you on the waiting list.</small>
       </div>
     </div>
 
@@ -495,7 +500,7 @@ footer.bottom { padding-bottom: 96px; }
       <p data-l="he">נסו את נובה לפני כולם, וספרו לנו מה אתם חושבים.</p>
       <p data-l="en">Try Nova before anyone else, and tell us what you think.</p>
     </div>
-    <div class="cta"><a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
+    <div class="cta"><a class="btn" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
   </section>
 
   <section class="block" id="sharing">
@@ -578,7 +583,7 @@ footer.bottom { padding-bottom: 96px; }
       <h2 data-l="en">Be among the first to meet Nova</h2>
       <p data-l="he">הצטרפו לקהילת הבודקים שלנו, נסו את נובה, וספרו לנו מה אתם חושבים. כל הערה עוזרת לנו לבנות אותה טוב יותר.</p>
       <p data-l="en">Join our testers' community, try Nova, and tell us what you think. Every note helps us make her better.</p>
-      <div class="cta"><a class="btn" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a></div>
+      <div class="cta"><a class="btn" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a><small data-l="he">כבר נרשמת? <a href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener">לקבוצת הבודקים בווטסאפ</a></small><small data-l="en">Already signed up? <a href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener">Join the testers' WhatsApp group</a></small></div>
       <small data-l="he">או כתבו לנו: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a></small><small data-l="en">Or write to us: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a></small>
     </div>
   </section>
@@ -593,7 +598,7 @@ footer.bottom { padding-bottom: 96px; }
 <!-- Once the hero is out of view, a slim bar keeps the way in close; it steps aside at the final call to action. -->
 <div class="dock" data-dock hidden>
   <span data-l="he">הצטרפו לבודקים הראשונים</span><span data-l="en">Join our first testers</span>
-  <a class="btn sm" href="https://chat.whatsapp.com/GicdUQKgHyyL1c5hftEtMw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A2 2 0 0 1 5.5 4.5h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-3.5 3v-3h0a2 2 0 0 1-2-2z"/><path d="M15.5 9h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2v3l-3.5-3h-4a2 2 0 0 1-2-1.6"/></svg><span data-l="he">לקבוצת הבודקים בווטסאפ</span><span data-l="en">Join the WhatsApp group</span></a><a class="btn alt sm" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
+  <a class="btn sm" href="mailto:hi@hi-nova.com?subject=%D7%91%D7%A7%D7%A9%D7%94%20%D7%9C%D7%A0%D7%A1%D7%95%D7%AA%20%D7%90%D7%AA%20%D7%A0%D7%95%D7%91%D7%94" data-access-open><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="M4 7l8 6 8-6"/></svg><span data-l="he">לבקש גישה לנובה</span><span data-l="en">Request access</span></a>
 </div>
 
 <script>
@@ -733,8 +738,8 @@ footer.bottom { padding-bottom: 96px; }
   });
 })();
 </script><div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
-  <p data-l="he">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים. <a href="/privacy.html#site">פרטים</a></p>
-  <p data-l="en">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents. <a href="/privacy.html#site-en">Details</a></p>
+  <p data-l="he"><span class="consent-long">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים.</span><span class="consent-short">עוגיות לסטטיסטיקה בלבד, בלי פרסום.</span> <a href="/privacy.html#site">פרטים</a></p>
+  <p data-l="en"><span class="consent-long">We use Google Analytics to understand how the site is used. No ads, and nothing from the app or your documents.</span><span class="consent-short">Cookies for statistics only, no ads.</span> <a href="/privacy.html#site-en">Details</a></p>
   <div class="consent-actions">
     <button type="button" class="btn sm" data-consent-choice="granted"><span data-l="he">מאשר/ת</span><span data-l="en">Accept</span></button>
     <button type="button" class="btn alt sm" data-consent-choice="denied"><span data-l="he">לא, תודה</span><span data-l="en">No thanks</span></button>
@@ -744,7 +749,14 @@ footer.bottom { padding-bottom: 96px; }
 (function () {
   var box = document.querySelector('[data-consent]'); if (!box) return;
   var saved = null; try { saved = localStorage.getItem('nova-consent'); } catch (e) {}
-  if (!saved) box.hidden = false;
+  function set(open) { box.hidden = !open; document.documentElement.classList.toggle('consent-open', open); }
+  // Not over the first screen: after the visitor scrolls past the hero, or after 8 seconds.
+  if (!saved) {
+    var hero = document.querySelector('.hero'), timer = setTimeout(show, 8000);
+    function show() { clearTimeout(timer); window.removeEventListener('scroll', onScroll); if (!saved) set(true); }
+    function onScroll() { if (!hero || hero.getBoundingClientRect().bottom < 0) show(); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
   document.addEventListener('click', function (e) {
     var t = e.target.closest ? e.target : null; if (!t) return;
     var choice = t.closest('[data-consent-choice]');
@@ -752,9 +764,9 @@ footer.bottom { padding-bottom: 96px; }
       var v = choice.getAttribute('data-consent-choice');
       try { localStorage.setItem('nova-consent', v); } catch (err) {}
       if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
-      box.hidden = true; return;
+      saved = v; set(false); return;
     }
-    if (t.closest('[data-consent-open]')) { e.preventDefault(); box.hidden = false; return; }
+    if (t.closest('[data-consent-open]')) { e.preventDefault(); set(true); return; }
     if (!window.gtag) return;
     var a = t.closest('a');
     // request_access is sent by the form when a request is saved (ACCESS below), not on a click.
