@@ -51,6 +51,13 @@
 <main class="sheet">
 <div class="wrap">
 
+  <!-- For visitors from LinkedIn (utm_source=linkedin): professionals, right after the hero. Everyone sees the card under "Sharing". -->
+  <section class="block" id="pros" data-pros hidden>
+    <span class="kicker" data-l="he">לאנשי מקצוע</span><span class="kicker" data-l="en">For professionals</span>
+    <p class="sub" data-l="he">עורכי דין, מעצבי פנים, אדריכלים ומשכירים: משתפים עם הלקוח תיקייה אחת, והלקוח שואל את נובה במקום להתקשר אליכם. לאנשי מקצוע בקבוצה הראשונה: הדרכה אישית.</p>
+    <p class="sub" data-l="en">Lawyers, interior designers, architects and landlords: share one folder with your client, and the client asks Nova instead of calling you. For professionals in the first group: a personal walkthrough.</p>
+  </section>
+
   <section class="block" id="what">
     <span class="kicker" data-l="he">מה נובה עושה</span><span class="kicker" data-l="en">What Nova does</span>
     <h2 data-l="he">כל הניירת שלכם, במקום אחד שמבין אותה</h2>
@@ -87,14 +94,19 @@
     <span class="kicker" data-l="he">ככה זה נראה</span><span class="kicker" data-l="en">See it</span>
     <h2 data-l="he">נובה, מקרוב</h2>
     <h2 data-l="en">Nova, up close</h2>
+    <!-- 13 s, muted, Hebrew captions: plays only while on screen, and loads nothing until then. -->
+    <figure class="showcase" data-l="he">
+      <video data-showcase muted loop playsinline preload="none" poster="img/showcase-poster.jpg" width="320" height="568"
+        aria-label="סרטון קצר: שואלים את נובה שאלה, מדברים איתה בקול, ורואים מה עומד לפוג"><source src="img/showcase.mp4" type="video/mp4"></video>
+    </figure>
     <div class="gallery">
-      <figure><img src="img/phone-answers.png" width="709" height="1200" loading="lazy" alt="Nova answering a question about a car insurance policy, with the source page">
+      <figure><img src="img/phone-answers.webp" width="709" height="1200" loading="lazy" alt="Nova answering a question about a car insurance policy, with the source page">
         <figcaption><span data-l="he">שואלים, ונובה עונה עם מקור</span><span data-l="en">Ask, and Nova answers with the source</span></figcaption></figure>
-      <figure><img src="img/phone-document.png" width="709" height="1200" loading="lazy" alt="A car insurance policy with the dates and amounts Nova found">
+      <figure><img src="img/phone-document.webp" width="709" height="1200" loading="lazy" alt="A car insurance policy with the dates and amounts Nova found">
         <figcaption><span data-l="he">כל הפרטים מכל מסמך</span><span data-l="en">Every detail from every document</span></figcaption></figure>
-      <figure><img src="img/phone-coming-up.png" width="709" height="1200" loading="lazy" alt="The Coming up screen with expiry dates">
+      <figure><img src="img/phone-coming-up.webp" width="709" height="1200" loading="lazy" alt="The Coming up screen with expiry dates">
         <figcaption><span data-l="he">רואים מראש מה עומד לפוג</span><span data-l="en">See what's about to expire</span></figcaption></figure>
-      <figure><img src="img/phone-voice.png" width="709" height="1200" loading="lazy" alt="A voice call with Nova">
+      <figure><img src="img/phone-voice.webp" width="709" height="1200" loading="lazy" alt="A voice call with Nova">
         <figcaption><span data-l="he">פשוט מדברים איתה</span><span data-l="en">Just talk to her</span></figcaption></figure>
     </div>
     <p class="fine" data-l="he">מסכים לדוגמה, עם מסמכים לדוגמה.</p>
@@ -138,10 +150,10 @@
 
   <section class="join-strip" aria-label="Join">
     <div>
-      <h2 data-l="he">הצטרפו לקהילת הבודקים הראשונים שלנו</h2>
-      <h2 data-l="en">Join the community of our first testers</h2>
-      <p data-l="he">נסו את נובה לפני כולם, וספרו לנו מה אתם חושבים.</p>
-      <p data-l="en">Try Nova before anyone else, and tell us what you think.</p>
+      <h2 data-l="he">100 מקומות בקבוצת הבודקים הראשונה</h2>
+      <h2 data-l="en">100 places in the first testing group</h2>
+      <p data-l="he">מה מקבלים: גישה ראשונה לנובה וקו ישיר אלינו. מה מבקשים: להשתמש בה שבועיים ולספר מה עבד ומה לא.</p>
+      <p data-l="en">What you get: first access to Nova and a direct line to us. What we ask: use her for two weeks and tell us what worked and what didn't.</p>
     </div>
     <div class="cta">{{CTA_BUTTONS}}</div>
   </section>
@@ -167,9 +179,9 @@
       </article>
       <article class="card">
         <span class="ico">{{ICON_briefcase}}</span>
-        <h3 data-l="he">עורכי דין ויועצים</h3><h3 data-l="en">Lawyers and advisors</h3>
-        <p data-l="he">משתפים עם הלקוח את התיקייה שלו, והוא שואל את נובה במקום להרים אליכם טלפון על כל שאלה קטנה. תנו ללקוחות שלכם את הכוח של נובה.</p>
-        <p data-l="en">Share a client's folder with them, and they ask Nova instead of calling you about every little question. Give your clients the power of Nova.</p>
+        <h3 data-l="he">עורכי דין, מעצבים ואדריכלים</h3><h3 data-l="en">Lawyers, designers and architects</h3>
+        <p data-l="he">משתפים עם הלקוח את התיקייה שלו, והוא שואל את נובה במקום להרים אליכם טלפון על כל שאלה קטנה. הלקוח מקבל תשובה מהחוזה, עם מספר העמוד, גם בעשר בלילה.</p>
+        <p data-l="en">Share a client's folder with them, and they ask Nova instead of calling you about every little question. Your client gets an answer from the contract, with the page number, even at ten at night.</p>
       </article>
       <article class="card">
         <span class="ico">{{ICON_share}}</span>
@@ -239,3 +251,21 @@
 </div>
 
 {{CHAT_SCRIPT}}
+<script>
+(function () {
+  // LinkedIn visitors (the professionals' post) see the professionals' strip first.
+  var pros = document.querySelector('[data-pros]');
+  if (pros && (window.novaUtm || {}).utm_source === 'linkedin') pros.hidden = false;
+  // The clip plays only while it is on screen, so it costs nothing to anyone who doesn't scroll to it.
+  // With reduced motion, or without IntersectionObserver, it waits for a tap.
+  var v = document.querySelector('[data-showcase]');
+  if (!v) return;
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (still || !('IntersectionObserver' in window)) { v.controls = true; return; }
+  new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause();
+    });
+  }, { threshold: 0.5 }).observe(v);
+})();
+</script>
