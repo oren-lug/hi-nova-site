@@ -77,6 +77,40 @@ UTM_SCRIPT = """<script>
 })();
 </script>"""
 
+# The site's own visit counter (owner, 2026-11-22; Stacy's measurement fix 3). Each visit and click goes to Nova's API by
+# sendBeacon and is counted per day, with no cookie, IP address or identifier (privacy policy: the site section).
+# A visit counts once per page per tab. ?team=1 on a device keeps that device out (the owner's own visits); ?team=0 undoes it.
+COUNTER_SCRIPT = """<script>
+(function () {
+  var API = %s, team = false;
+  try {
+    var t = new URLSearchParams(location.search).get('team');
+    if (t === '1') localStorage.setItem('nova-team', '1');
+    if (t === '0') localStorage.removeItem('nova-team');
+    team = localStorage.getItem('nova-team') === '1';
+  } catch (e) {}
+  window.novaCount = function (event) {
+    if (team || !API) return;
+    var u = window.novaUtm || {}, ref = '';
+    try { if (document.referrer) { var h = new URL(document.referrer).hostname; if (h !== location.hostname) ref = h; } } catch (e) {}
+    var body = JSON.stringify({ event: event, path: location.pathname, utm_source: u.utm_source || '', utm_medium: u.utm_medium || '',
+      utm_campaign: u.utm_campaign || '', referrer_host: ref, lang: document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'he',
+      mobile: window.innerWidth <= 600 });
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(API + '/site-events', body)) return;
+      fetch(API + '/site-events', { method: 'POST', body: body, keepalive: true, mode: 'no-cors' });
+    } catch (e) {}
+  };
+  var key = 'nova-landed:' + location.pathname, seen = false;
+  try { seen = sessionStorage.getItem(key) === '1'; sessionStorage.setItem(key, '1'); } catch (e) {}
+  if (!seen) window.novaCount('landing');
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="chat.whatsapp.com"]');
+    if (a) window.novaCount('whatsapp_click');
+  });
+})();
+</script>""" % json.dumps(API)
+
 # The app's NovaSky (components/NovaSky.tsx): glows (colour, size, x, y, opacity, duration, scale), drift as fractions of
 # the glow itself; hexagons (size, x, opacity, duration, start offset, turn direction).
 GLOWS = [('#5B2350', 1.6, 0.15, 0.10, 0.35, 21, 1.10, 0.05, 0.019),
@@ -269,7 +303,9 @@ def analytics_head() -> str:
             "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});"
             "var c=null;try{c=localStorage.getItem('nova-consent')}catch(e){}"
             "if(c==='granted')gtag('consent','update',{analytics_storage:'granted'});"
-            f"gtag('js',new Date());gtag('config','{GA_ID}');</script>")
+            # The team's own devices (?team=1, kept in localStorage): marked internal, for GA's "Internal traffic" filter.
+            "var tm=false;try{tm=new URLSearchParams(location.search).get('team')==='1'||(localStorage.getItem('nova-team')==='1'&&new URLSearchParams(location.search).get('team')!=='0')}catch(e){}"
+            f"gtag('js',new Date());gtag('config','{GA_ID}',tm?{{traffic_type:'internal'}}:{{}});</script>")
 
 CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="polite" aria-label="Cookies">
   <p data-l="he"><span class="consent-long">אנחנו משתמשים ב-Google Analytics כדי להבין איך משתמשים באתר. בלי פרסום, ובלי שום מידע מהאפליקציה או מהמסמכים.</span><span class="consent-short">עוגיות לסטטיסטיקה בלבד, בלי פרסום.</span> <a href="/privacy.html#site">פרטים</a></p>
@@ -287,7 +323,10 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
   // Not over the first screen: after the visitor scrolls past the hero, or after 8 seconds.
   if (!saved) {
     var hero = document.querySelector('.hero'), timer = setTimeout(show, 8000);
-    function show() { clearTimeout(timer); window.removeEventListener('scroll', onScroll); if (!saved) set(true); }
+    function show() {
+      clearTimeout(timer); window.removeEventListener('scroll', onScroll);
+      if (!saved) { set(true); if (window.novaCount) novaCount('consent_shown'); }
+    }
     function onScroll() { if (!hero || hero.getBoundingClientRect().bottom < 0) show(); }
     window.addEventListener('scroll', onScroll, { passive: true });
   }
@@ -298,6 +337,7 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
       var v = choice.getAttribute('data-consent-choice');
       try { localStorage.setItem('nova-consent', v); } catch (err) {}
       if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
+      if (v === 'granted' && window.novaCount) novaCount('consent_accept');
       saved = v; set(false); return;
     }
     if (t.closest('[data-consent-open]')) { e.preventDefault(); set(true); return; }
@@ -313,9 +353,11 @@ CONSENT = """<div class="consent" data-consent hidden role="dialog" aria-live="p
 
 SITE_POLICY = {
     "he": """<h2 id="site">האתר hi-nova.com</h2>
-      <p>באתר אנחנו משתמשים ב-Google Analytics כדי לספור ביקורים ולהבין אילו חלקים בו עוזרים, למשל כמה אנשים מבקשים להצטרף לבדיקה. Google Analytics שומר עוגיות רק אם אישרת זאת בהודעה שמופיעה באתר; אחרת הוא מקבל רק אותות בסיסיים בלי עוגיות. המידע הזה לא קשור לחשבון בנובה ולא למסמכים, ולא משמש לפרסום. אפשר לשנות את הבחירה בכל רגע דרך "הגדרות עוגיות" בתחתית האתר.</p>""",
+      <p>באתר אנחנו משתמשים ב-Google Analytics כדי לספור ביקורים ולהבין אילו חלקים בו עוזרים, למשל כמה אנשים מבקשים להצטרף לבדיקה. Google Analytics שומר עוגיות רק אם אישרת זאת בהודעה שמופיעה באתר; אחרת הוא מקבל רק אותות בסיסיים בלי עוגיות. המידע הזה לא קשור לחשבון בנובה ולא למסמכים, ולא משמש לפרסום. אפשר לשנות את הבחירה בכל רגע דרך "הגדרות עוגיות" בתחתית האתר.</p>
+      <p>בנוסף, השרת של נובה סופר ביקורים ולחיצות באתר בלי עוגיות ובלי לשמור כתובת IP או מזהה: רק התאריך, העמוד, השפה, אם הגעתם מטלפון, ומאיזה קישור או אתר הגעתם.</p>""",
     "en": """<h2 id="site-en">The hi-nova.com website</h2>
-      <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>""",
+      <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>
+      <p>Nova's server also counts visits and clicks on the site without cookies and without storing your IP address or any identifier: only the date, the page, the language, whether you came from a phone, and which link or site brought you.</p>""",
 }
 
 ACCESS_POLICY = {
@@ -398,6 +440,7 @@ def access_dialog() -> str:
     from = from_; form.hidden = false; done.hidden = true; err.hidden = true; submit.disabled = false;
     presetSource();
     dlg.showModal();
+    if (window.novaCount) novaCount('form_open');
     if (window.gtag) gtag('event', 'access_form_open', {{ link_location: from }});
   }}
   document.addEventListener('click', function (e) {{
@@ -423,6 +466,7 @@ def access_dialog() -> str:
         [].forEach.call(done.querySelectorAll('[data-done]'), function (p) {{ p.hidden = p.getAttribute('data-done') !== kind; }});
         form.hidden = true; done.hidden = false; form.reset(); hint.hidden = true;
         if (window.gtag && !d.alreadyListed) gtag('event', 'request_access', {{ role: body.role, source: body.source, phone: body.phone, link_location: from }});
+        if (window.novaCount && !d.alreadyListed) novaCount('form_ok');
       }})
       .catch(function () {{ submit.disabled = false; fail('net'); }});
   }});
@@ -435,7 +479,7 @@ def head(name: str, css: str, favicon_href: str) -> str:
             '<meta name="claude:viewport-fit-sides" content="cover">'
             f'<meta name="description" content="{html.escape(p["desc"])}">{social_meta(name)}'
             f'<link rel="icon" href="{favicon_href}" type="image/svg+xml">'
-            f'{FONTS}<style>{css}</style>{LANG_SCRIPT}{UTM_SCRIPT}')
+            f'{FONTS}<style>{css}</style>{LANG_SCRIPT}{UTM_SCRIPT}{COUNTER_SCRIPT}')
 
 def standalone(name: str, css: str, favicon_href: str, analytics: bool = True) -> str:
     body = fill((SRC / f"{name}.body.html").read_text(), name)
