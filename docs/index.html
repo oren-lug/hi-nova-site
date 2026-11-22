@@ -698,7 +698,8 @@ footer.bottom { padding-bottom: 96px; }
   if (still || !('IntersectionObserver' in window)) { v.controls = true; return; }
   new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
-      if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause();
+      // A phone that refuses to play it by itself (low-power mode, some in-app browsers) gets the play button instead.
+      if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () { v.controls = true; }); } else v.pause();
     });
   }, { threshold: 0.5 }).observe(v);
 })();
