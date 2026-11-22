@@ -1,4 +1,4 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7MWNCDS4FL"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});var c=null;try{c=localStorage.getItem('nova-consent')}catch(e){}if(c==='granted')gtag('consent','update',{analytics_storage:'granted'});gtag('js',new Date());gtag('config','G-7MWNCDS4FL');</script><title>Nova Privacy Policy</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta property="og:type" content="website"><meta property="og:site_name" content="Nova"><meta property="og:url" content="https://hi-nova.com/privacy.html"><meta property="og:title" content="Nova Privacy Policy"><meta property="og:description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta property="og:image" content="https://hi-nova.com/og.jpg"><meta property="og:image:secure_url" content="https://hi-nova.com/og.jpg"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nova נובה: העוזרת האישית שלך לניירת"><meta property="og:locale" content="he_IL"><meta property="og:locale:alternate" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Nova Privacy Policy"><meta name="twitter:description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta name="twitter:image" content="https://hi-nova.com/og.jpg"><link rel="canonical" href="https://hi-nova.com/privacy.html"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Rubik:wght@500&display=swap"><style>/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><script async src="https://www.googletagmanager.com/gtag/js?id=G-7MWNCDS4FL"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});var c=null;try{c=localStorage.getItem('nova-consent')}catch(e){}if(c==='granted')gtag('consent','update',{analytics_storage:'granted'});var tm=false;try{tm=new URLSearchParams(location.search).get('team')==='1'||(localStorage.getItem('nova-team')==='1'&&new URLSearchParams(location.search).get('team')!=='0')}catch(e){}gtag('js',new Date());gtag('config','G-7MWNCDS4FL',tm?{traffic_type:'internal'}:{});</script><title>Nova Privacy Policy</title><meta name="claude:viewport-fit-sides" content="cover"><meta name="description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta property="og:type" content="website"><meta property="og:site_name" content="Nova"><meta property="og:url" content="https://hi-nova.com/privacy.html"><meta property="og:title" content="Nova Privacy Policy"><meta property="og:description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta property="og:image" content="https://hi-nova.com/og.jpg"><meta property="og:image:secure_url" content="https://hi-nova.com/og.jpg"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Nova נובה: העוזרת האישית שלך לניירת"><meta property="og:locale" content="he_IL"><meta property="og:locale:alternate" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Nova Privacy Policy"><meta name="twitter:description" content="מדיניות הפרטיות של נובה. Nova&#x27;s privacy policy."><meta name="twitter:image" content="https://hi-nova.com/og.jpg"><link rel="canonical" href="https://hi-nova.com/privacy.html"><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Rubik:wght@500&display=swap"><style>/* Layout: one centred column; a hero with a sample answer card, a feature grid, a privacy band, a footer.
    Tokens are the app's own (mobile theme/tokens.ts, design V4 "Horizon"): warm paper, ink, Nova pink. */
 :root {
   --bg: #FBFAF7; --surface: #FFFFFF; --nav: #F3F1EC; --border: #ECE9E2; --text: #1C1D21; --muted: #6B6D74;
@@ -366,6 +366,35 @@ footer.bottom { padding-bottom: 96px; }
   } catch (e) {}
   window.novaUtm = got;
 })();
+</script><script>
+(function () {
+  var API = "https://novaapi-production-ebd4.up.railway.app", team = false;
+  try {
+    var t = new URLSearchParams(location.search).get('team');
+    if (t === '1') localStorage.setItem('nova-team', '1');
+    if (t === '0') localStorage.removeItem('nova-team');
+    team = localStorage.getItem('nova-team') === '1';
+  } catch (e) {}
+  window.novaCount = function (event) {
+    if (team || !API) return;
+    var u = window.novaUtm || {}, ref = '';
+    try { if (document.referrer) { var h = new URL(document.referrer).hostname; if (h !== location.hostname) ref = h; } } catch (e) {}
+    var body = JSON.stringify({ event: event, path: location.pathname, utm_source: u.utm_source || '', utm_medium: u.utm_medium || '',
+      utm_campaign: u.utm_campaign || '', referrer_host: ref, lang: document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'he',
+      mobile: window.innerWidth <= 600 });
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(API + '/site-events', body)) return;
+      fetch(API + '/site-events', { method: 'POST', body: body, keepalive: true, mode: 'no-cors' });
+    } catch (e) {}
+  };
+  var key = 'nova-landed:' + location.pathname, seen = false;
+  try { seen = sessionStorage.getItem(key) === '1'; sessionStorage.setItem(key, '1'); } catch (e) {}
+  if (!seen) window.novaCount('landing');
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="chat.whatsapp.com"]');
+    if (a) window.novaCount('whatsapp_click');
+  });
+})();
 </script></head><body><div class="sky">
 <span class="glow" aria-hidden="true" style="--c:#5B2350;--s:1.6;--x:0.15;--y:0.1;--o:0.35;--d:21s;--k:1.1;--dx:0.05;--dy:0.019"></span>
 <span class="glow" aria-hidden="true" style="--c:#E8437E;--s:1.1;--x:0.95;--y:0.05;--o:0.24;--d:16s;--k:1.12;--dx:-0.091;--dy:0.036"></span>
@@ -462,6 +491,7 @@ footer.bottom { padding-bottom: 96px; }
 
       <h2 id="site">האתר hi-nova.com</h2>
       <p>באתר אנחנו משתמשים ב-Google Analytics כדי לספור ביקורים ולהבין אילו חלקים בו עוזרים, למשל כמה אנשים מבקשים להצטרף לבדיקה. Google Analytics שומר עוגיות רק אם אישרת זאת בהודעה שמופיעה באתר; אחרת הוא מקבל רק אותות בסיסיים בלי עוגיות. המידע הזה לא קשור לחשבון בנובה ולא למסמכים, ולא משמש לפרסום. אפשר לשנות את הבחירה בכל רגע דרך "הגדרות עוגיות" בתחתית האתר.</p>
+      <p>בנוסף, השרת של נובה סופר ביקורים ולחיצות באתר בלי עוגיות ובלי לשמור כתובת IP או מזהה: רק התאריך, העמוד, השפה, אם הגעתם מטלפון, ומאיזה קישור או אתר הגעתם.</p>
 
       <h2 id="access">טופס בקשת הגישה</h2>
       <p>כדי לבקש להצטרף לבדיקה, אתם ממלאים באתר שם, כתובת Gmail (חשבון ה-Google שבטלפון), סוג הטלפון, מי אתם (למשל אדם פרטי או עורכי דין) ואיך שמעתם על נובה. אנחנו משתמשים בפרטים רק כדי לצרף אתכם לבדיקה דרך Google Play (נוסיף את הכתובת לרשימת הבודקים שם), לחזור אליכם במייל, ולדעת מאיפה מגיעים אלינו. הפרטים נשמרים במסד הנתונים של נובה (Supabase) ונשלחים לתיבת הדואר שלנו (Resend). הם לא נמכרים ולא משמשים לפרסום. נשמור אותם עד סוף תקופת הבדיקה, או עד שתבקשו למחוק אותם: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a>.</p>
@@ -541,6 +571,7 @@ footer.bottom { padding-bottom: 96px; }
 
       <h2 id="site-en">The hi-nova.com website</h2>
       <p>On the website we use Google Analytics to count visits and understand which parts help, for example how many people ask to join the test. Google Analytics sets cookies only if you accept them in the notice on the site; otherwise it receives only basic, cookieless signals. This is not linked to your Nova account or documents, and it is not used for advertising. You can change your choice at any time with "Cookie settings" at the bottom of the site.</p>
+      <p>Nova's server also counts visits and clicks on the site without cookies and without storing your IP address or any identifier: only the date, the page, the language, whether you came from a phone, and which link or site brought you.</p>
 
       <h2 id="access-en">The request-access form</h2>
       <p>To ask to join the test, you fill in your name, your Gmail address (the Google account on your phone), your type of phone, who you are (for example a private person or a lawyer) and how you heard about Nova. We use these details only to add you to the test through Google Play (we add the address to its list of testers), to get back to you by email, and to learn how people find us. They are stored in Nova's database (Supabase) and emailed to our inbox (Resend). They are never sold or used for advertising. We keep them until the test ends, or until you ask us to delete them: <a href="mailto:hi@hi-nova.com">hi@hi-nova.com</a>.</p>
@@ -575,7 +606,10 @@ footer.bottom { padding-bottom: 96px; }
   // Not over the first screen: after the visitor scrolls past the hero, or after 8 seconds.
   if (!saved) {
     var hero = document.querySelector('.hero'), timer = setTimeout(show, 8000);
-    function show() { clearTimeout(timer); window.removeEventListener('scroll', onScroll); if (!saved) set(true); }
+    function show() {
+      clearTimeout(timer); window.removeEventListener('scroll', onScroll);
+      if (!saved) { set(true); if (window.novaCount) novaCount('consent_shown'); }
+    }
     function onScroll() { if (!hero || hero.getBoundingClientRect().bottom < 0) show(); }
     window.addEventListener('scroll', onScroll, { passive: true });
   }
@@ -586,6 +620,7 @@ footer.bottom { padding-bottom: 96px; }
       var v = choice.getAttribute('data-consent-choice');
       try { localStorage.setItem('nova-consent', v); } catch (err) {}
       if (window.gtag) gtag('consent', 'update', { analytics_storage: v });
+      if (v === 'granted' && window.novaCount) novaCount('consent_accept');
       saved = v; set(false); return;
     }
     if (t.closest('[data-consent-open]')) { e.preventDefault(); set(true); return; }
