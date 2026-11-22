@@ -58,6 +58,25 @@ LANG_SCRIPT = """<script>
 })();
 </script>"""
 
+# Where this visit came from: the campaign links' utm_* tags, kept for the visit (sessionStorage, gone when the tab closes).
+# The form skips "how did you hear" when the link already says, and LinkedIn visitors see the professionals' strip.
+UTM_SCRIPT = """<script>
+(function () {
+  var got = {}, any = false;
+  try {
+    var q = new URLSearchParams(location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign'].forEach(function (k) {
+      var v = q.get(k); if (v) { got[k] = v.toLowerCase().slice(0, 60); any = true; }
+    });
+  } catch (e) {}
+  try {
+    if (any) sessionStorage.setItem('nova-utm', JSON.stringify(got));
+    else got = JSON.parse(sessionStorage.getItem('nova-utm') || '{}') || {};
+  } catch (e) {}
+  window.novaUtm = got;
+})();
+</script>"""
+
 # The app's NovaSky (components/NovaSky.tsx): glows (colour, size, x, y, opacity, duration, scale), drift as fractions of
 # the glow itself; hexagons (size, x, opacity, duration, start offset, turn direction).
 GLOWS = [('#5B2350', 1.6, 0.15, 0.10, 0.35, 21, 1.10, 0.05, 0.019),
@@ -324,9 +343,9 @@ def access_dialog() -> str:
     <button type="button" class="access-close" data-access-close><span aria-hidden="true">×</span><span class="sr" data-l="he">סגירה</span><span class="sr" data-l="en">Close</span></button>
     <form class="access-form" data-access-form>
       <h2 id="access-title"><span data-l="he">בקשת גישה לנובה</span><span data-l="en">Request access to Nova</span></h2>
-      <p class="access-lead"><span data-l="he">אנחנו פותחים מקומות בקבוצת הבודקים הראשונה, באנדרואיד. נחזור אליך במייל.</span><span data-l="en">We're opening places in the first testing group, on Android. We'll get back to you by email.</span></p>
+      <p class="access-lead"><span data-l="he">כמה שאלות קצרות, ונחזור אליך במייל עם הזמנה ל-Google&nbsp;Play.</span><span data-l="en">A few short questions, and we'll email you an invitation to Google&nbsp;Play.</span></p>
       <label class="field"><span class="field-label"><span data-l="he">שם</span><span data-l="en">Name</span></span>
-        <input type="text" name="name" required maxlength="100" autocomplete="name" autofocus></label>
+        <input type="text" name="name" required maxlength="100" autocomplete="name"></label>
       <label class="field"><span class="field-label"><span data-l="he">כתובת Gmail</span><span data-l="en">Gmail address</span></span>
         <input type="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" dir="ltr">
         <span class="field-hint"><span data-l="he">Google Play מצרף בודקים לפי חשבון ה-Google שבטלפון, אז כדאי לכתוב את הכתובת הזו.</span><span data-l="en">Google Play adds testers by the Google account on their phone, so please use that address.</span></span></label>
@@ -340,7 +359,7 @@ def access_dialog() -> str:
       <input class="trap" type="text" name="extra" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="agree"><input type="checkbox" name="consent" required><span><span data-l="he">קראתי ואני מסכים/ה ל<a href="/privacy.html#access" target="_blank">מדיניות הפרטיות</a></span><span data-l="en">I agree to the <a href="/privacy.html#access-en" target="_blank">privacy policy</a></span></span></label>
       <p class="access-error" data-access-error role="alert" hidden></p>
-      <button class="btn" type="submit" data-access-submit><span data-l="he">שליחה</span><span data-l="en">Send</span></button>
+      <button class="btn" type="submit" data-access-submit><span data-l="he">לשמור לי מקום</span><span data-l="en">Save my place</span></button>
     </form>
     <div class="access-done" data-access-done hidden>
       <h2><span data-l="he">תודה, קיבלנו!</span><span data-l="en">Thanks, we got it!</span></h2>
@@ -368,8 +387,16 @@ def access_dialog() -> str:
   function picked(n) {{ var c = form.querySelector('[name="' + n + '"]:checked'); return c ? c.value : ''; }}
   function field(n) {{ return form.elements.namedItem(n); }}
   function fail(kind) {{ err.textContent = MSG[lang()][kind]; err.hidden = false; }}
+  // A campaign link that names the network already answers "how did you hear": that question is skipped.
+  function presetSource() {{
+    var utm = (window.novaUtm || {{}}).utm_source;
+    [].forEach.call(form.querySelectorAll('[name="source"]'), function (r) {{
+      if (utm && r.value === utm) {{ r.checked = true; r.closest('fieldset').hidden = true; }}
+    }});
+  }}
   function open(from_) {{
     from = from_; form.hidden = false; done.hidden = true; err.hidden = true; submit.disabled = false;
+    presetSource();
     dlg.showModal();
     if (window.gtag) gtag('event', 'access_form_open', {{ link_location: from }});
   }}
@@ -408,7 +435,7 @@ def head(name: str, css: str, favicon_href: str) -> str:
             '<meta name="claude:viewport-fit-sides" content="cover">'
             f'<meta name="description" content="{html.escape(p["desc"])}">{social_meta(name)}'
             f'<link rel="icon" href="{favicon_href}" type="image/svg+xml">'
-            f'{FONTS}<style>{css}</style>{LANG_SCRIPT}')
+            f'{FONTS}<style>{css}</style>{LANG_SCRIPT}{UTM_SCRIPT}')
 
 def standalone(name: str, css: str, favicon_href: str, analytics: bool = True) -> str:
     body = fill((SRC / f"{name}.body.html").read_text(), name)
@@ -433,11 +460,18 @@ def main() -> None:
     }], indent=2) + "\n")
     (site / "favicon.svg").write_text(FAVICON)
     (site / "og.jpg").write_bytes((SRC / "og.jpg").read_bytes())  # the link-preview card
-    # The app's screens (sample data), for the gallery.
+    # The app's screens (sample data) and the short clip, for "Nova, up close". Emptied first: nothing stale is served.
     for d in (site / "img", preview / "img"):
         d.mkdir(parents=True, exist_ok=True)
-        for f in (SRC / "img").glob("*.png"):
+        for f in d.iterdir():
+            f.unlink()
+        for f in (SRC / "img").iterdir():
             (d / f.name).write_bytes(f.read_bytes())
+    # For search engines: everything may be crawled; the sitemap lists the two pages.
+    (site / "robots.txt").write_text("User-agent: *\nAllow: /\n\nSitemap: https://hi-nova.com/sitemap.xml\n")
+    (site / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '  <url><loc>https://hi-nova.com/</loc></url>\n  <url><loc>https://hi-nova.com/privacy.html</loc></url>\n</urlset>\n')
     (site / ".nojekyll").write_text("")          # GitHub Pages: serve /.well-known as is
     (site / "CNAME").write_text("hi-nova.com\n")
     # The preview: the landing page as the Artifact's page (no document shell), the policy as a full page beside it.
